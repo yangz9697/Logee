@@ -1,0 +1,9 @@
+{
+	"navigationBarTitleText": "routeplan",
+	"navigationStyle": "custom",
+	"enablePullDownRefresh": false,
+	"usingComponents": {
+		"element": "miniprogram-element",
+		"custom-component": "../../custom-component/index"
+	}
+}

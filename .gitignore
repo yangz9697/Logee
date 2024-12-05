@@ -1,0 +1,35 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# WeChat Dev Tools
+project.private.config.json
+.miniprogram/
+
+# Dependencies
+node_modules/
+miniprogram_npm/
+
+# Build and temp files
+dist/
+.tmp/
+*.log
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage/
