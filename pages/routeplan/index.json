@@ -1,9 +1,6 @@
 {
-	"navigationBarTitleText": "routeplan",
-	"navigationStyle": "custom",
-	"enablePullDownRefresh": false,
-	"usingComponents": {
-		"element": "miniprogram-element",
-		"custom-component": "../../custom-component/index"
-	}
+	"navigationBarTitleText": "路线规划",
+	"usingComponents": {},
+	"navigationBarBackgroundColor": "#007AFF",
+	"navigationBarTextStyle": "white"
 }

@@ -1,6 +1,7 @@
 {
 	"pages": [
-		"pages/routeplan/index"
+		"pages/routeplan/index",
+		"pages/routeplan/map"
 	],
 	"window": {
 		"backgroundTextStyle": "dark",
@@ -14,7 +15,13 @@
 	],
 	"permission": {
 		"scope.userLocation": {
-			"desc": "你的位置信息将用于小程序定位"
+			"desc": "你的位置信息将用于查看运输路线"
+		}
+	},
+	"serviceMarket": {
+		"wx79ac3de8be320b71": {
+			"version": "1.0.0",
+			"provider": "wx79ac3de8be320b71"
 		}
 	}
 }
