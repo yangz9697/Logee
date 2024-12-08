@@ -1,0 +1,87 @@
+<view class="container">
+  <!-- 货物信息卡片 -->
+  <view class="info-column cargo-info">
+    <view class="column-title">货物信息</view>
+    <view class="cargo-grid">
+      <view class="cargo-item">
+        <text class="label">货物名称</text>
+        <text class="value">{{cargoName}}</text>
+      </view>
+      <view class="cargo-item">
+        <text class="label">包装方式</text>
+        <text class="value">{{packageType}}</text>
+      </view>
+      <view class="cargo-item">
+        <text class="label">吨位/方位</text>
+        <text class="value">{{weight}}吨/{{volume}}</text>
+      </view>
+      <view class="cargo-item">
+        <text class="label">车型要求</text>
+        <text class="value">{{truckType}}</text>
+      </view>
+      <view class="cargo-item full-width">
+        <text class="label">备注</text>
+        <text class="value">{{remark}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提货信息 -->
+  <view class="info-column" bindtap="showPickupRoute">
+    <view class="column-title">
+      提货信息
+      <text class="price-tag">¥{{pickupPrice}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">装货地址：</text>
+      <text class="value long-text">{{loadingAddress}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">始发站点：</text>
+      <text class="value">{{origin.name}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">接货距离：</text>
+      <text class="value">{{pickupDistance}}</text>
+    </view>
+  </view>
+
+  <!-- 送货信息 -->
+  <view class="info-column" bindtap="showDeliveryRoute">
+    <view class="column-title">
+      送货信息
+      <text class="price-tag">¥{{deliveryPrice}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">目的站点：</text>
+      <text class="value">{{destination.name}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">卸货地址：</text>
+      <text class="value long-text">{{unloadingAddress}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">送货距离：</text>
+      <text class="value">{{deliveryDistance}}</text>
+    </view>
+  </view>
+
+  <!-- 底部价格栏 -->
+  <view class="bottom-bar">
+    <view class="price-item">
+      <text class="price-label">干线联运价格(元/吨)</text>
+      <view class="stepper">
+        <text class="stepper-btn" bindtap="decreasePrice">-</text>
+        <text class="stepper-value">{{transitPrice}}</text>
+        <text class="stepper-btn" bindtap="increasePrice">+</text>
+      </view>
+    </view>
+    <view class="price-item bottom-actions">
+      <view class="total-price-wrapper">
+        <text class="price-label">总价</text>
+        <text class="price-value">¥{{totalPrice}}</text>
+      </view>
+      <button class="reupload-btn" bindtap="onBack">返回修改</button>
+    </view>
+  </view>
+</view> 

@@ -1,6 +1,6 @@
 <view class="container">
-  <!-- 站点选择区域 - 始终显示 -->
-  <view class="info-column">
+  <!-- 站点选择区域 - 仅在未识别时显示 -->
+  <view class="info-column" wx:if="{{!hasImageInfo}}">
     <view class="column-title">运输路线选择</view>
     
     <!-- 始发点选择 -->
@@ -29,7 +29,7 @@
               data-point="广州君建零部件产业园">
           广州君建零部件产业园
         </view>
-        <view class="select-item {{selectedEndPoint === '成都经开区南五路与车城西一路交叉口' ? 'active' : ''}}" 
+        <view class="select-item {{selectedEndPoint === '成都经开区南五路与车城西一路交���口' ? 'active' : ''}}" 
               bindtap="selectEndPoint" 
               data-point="成都经开区南五路与车城西一路交叉口">
           成都经开区南五路与车城西一路交叉口
@@ -38,18 +38,18 @@
     </view>
   </view>
 
-  <!-- 上传图片区域 - 仅在选择了站点且未上传图片时显示 -->
+  <!-- 上传图片区域 - 仅在选择了站点且未识别时显示 -->
   <view class="upload-section" wx:if="{{!hasImageInfo && selectedStartPoint && selectedEndPoint}}">
     <button class="upload-btn" bindtap="chooseImage">上传/拍摄图片</button>
   </view>
 
-  <!-- 提示选择站点 -->
-  <view class="tip-text" wx:if="{{!selectedStartPoint || !selectedEndPoint}}">
+  <!-- 提示选择站点 - 仅在未选择站点且未识别时显示 -->
+  <view class="tip-text" wx:if="{{!hasImageInfo && (!selectedStartPoint || !selectedEndPoint)}}">
     请先选择始发点和目标站点
   </view>
 
-  <!-- 图片预览 -->
-  <image wx:if="{{tempImagePath}}" class="preview-image" src="{{tempImagePath}}" mode="aspectFit"></image>
+  <!-- 图片预览 - 仅在未识别时显示 -->
+  <image wx:if="{{tempImagePath && !hasImageInfo}}" class="preview-image" src="{{tempImagePath}}" mode="aspectFit"></image>
 
   <!-- 货物信息卡片 - 仅在识别成功后显示 -->
   <view class="info-container" wx:if="{{hasImageInfo}}">
