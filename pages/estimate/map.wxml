@@ -7,12 +7,13 @@
     scale="{{scale}}"
     markers="{{markers}}"
     polyline="{{polyline}}"
+    include-points="{{includePoints}}"
     show-location
   ></map>
   <view class="info-panel">
     <view class="route-info">
-      <text class="distance">总距离：{{distance}}公里</text>
-      <text class="duration">预计时间：{{duration}}分钟</text>
+      <text class="distance">总距离：{{distance}}</text>
+      <text class="duration">预计时间：{{duration}}</text>
     </view>
     <view class="address-info">
       <view class="start">

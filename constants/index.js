@@ -1,26 +1,33 @@
 const MOCK_RESPONSE = {
-  pickupPrice: 180,
-  deliveryPrice: 220,
+  cargoName: '电子产品',
+  packageType: '纸箱',
+  volume: '2方',
   weight: 5,
-  cargoName: '电子设备',
-  packageType: '木箱',
-  volume: '10方',
-  truckType: '4.2米厢式货车',
-  remark: '易碎品，小心轻放'
-};
-
-const STATIONS = {
-  startPoints: {
-    '京东南京转运中心': null,
-    '常州嘉民物流中心': null
+  vehicleLength: '6.8米',
+  palletCount: 0,
+  loadingAddress: '广州市天河区天河路123号',
+  unloadingAddress: '深圳市南山区科技园456号',
+  pickupDistance: '3.5公里',
+  deliveryDistance: '5.2公里',
+  pickupPrice: 50,
+  deliveryPrice: 80,
+  transitPrice: 100,
+  origin: {
+    name: '广州站',
+    lat: 23.137903,
+    lng: 113.327174
   },
-  endPoints: {
-    '广州君建零部件产业园': null,
-    '成都经开区南五路与车城西一路交叉口': null
+  destination: {
+    name: '深圳站',
+    lat: 22.543527,
+    lng: 114.057939
   }
 };
 
+// 用于控制是否使用mock数据的开关
+const USE_MOCK = false;
+
 module.exports = {
   MOCK_RESPONSE,
-  STATIONS
+  USE_MOCK
 }; 

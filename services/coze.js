@@ -44,15 +44,18 @@ const cozeService = {
       const result = JSON.parse(response.data.data);
       console.log('Coze 解析后的数据:', result);
 
-      const { loadingPlace, unloadingPlace } = result;
+      const { loadingPlace, unloadingPlace, price, weight, vehicleLength } = result;
       
-      if (!loadingPlace || !unloadingPlace) {
-        throw new Error('未能识别出装卸货地址');
+      if (!loadingPlace || !unloadingPlace || !price || !weight || !vehicleLength) {
+        throw new Error('未能识别出完整信息');
       }
 
       return { 
         loadingPlace, 
-        unloadingPlace 
+        unloadingPlace,
+        price,
+        weight,
+        vehicleLength
       };
     }
     throw new Error(response.data?.msg || '工作流调用失败');

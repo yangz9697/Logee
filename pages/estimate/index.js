@@ -1,5 +1,6 @@
 const { origins } = require('../../constants/stations');
 const ocrService = require('../../services/ocr');
+const cozeService = require('../../services/coze');
 
 Page({
   data: {
@@ -131,23 +132,45 @@ Page({
   },
 
   // 下一步
-  onNextStep() {
+  async onNextStep() {
     if (!this.data.canProceed) return;
 
-    const { selectedOrigin, destinations, endPointIndex, tempImagePath, ocrText } = this.data;
-    const selectedDestination = destinations[endPointIndex];
+    try {
+      wx.showLoading({ title: '正在分析数据...' });
 
-    wx.navigateTo({
-      url: '/pages/estimate/detail',
-      success: (res) => {
-        res.eventChannel.emit('estimateData', {
+      // 使用现有的 callWorkflow 方法分析文本
+      const response = await cozeService.callWorkflow(this.data.ocrText);
+      const result = await cozeService.handleResponse(response);
+
+      // 跳转到详情页
+      const { selectedOrigin, destinations, endPointIndex, tempImagePath, ocrText } = this.data;
+      const selectedDestination = destinations[endPointIndex];
+
+      // 将数据编码为URL参数
+      wx.navigateTo({
+        url: `/pages/estimate/detail?data=${encodeURIComponent(JSON.stringify({
           origin: selectedOrigin,
           destination: selectedDestination,
           imagePath: tempImagePath,
-          ocrText  // 传递OCR结果
-        });
-      }
-    });
+          ocrText,
+          loadingAddress: result.loadingPlace,
+          unloadingAddress: result.unloadingPlace,
+          totalQuote: result.price,
+          weight: result.weight,
+          transitPrice: this.data.currentPrice,
+          vehicleLength: result.vehicleLength
+        }))}`,
+      });
+
+    } catch (error) {
+      console.error('数据分析失败:', error);
+      wx.showToast({
+        title: error.message || '分析失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 添加统一的错误处理方法

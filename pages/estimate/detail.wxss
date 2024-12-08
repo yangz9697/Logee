@@ -1,88 +1,84 @@
 /* pages/estimate/detail.wxss */
 .container {
   min-height: 100vh;
-  background: #fff;
-  padding-bottom: env(safe-area-inset-bottom);
+  background: #f5f7fa;
+  padding: 24rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
-/* 货物信息卡片 */
-.info-column {
-  background: #fff;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-}
-
-.column-title {
-  font-size: 32rpx;
-  color: #333;
-  font-weight: 500;
+/* 卡片基础样式 */
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
   margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 24rpx;
+  border-bottom: 2rpx solid #f5f7fa;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.cargo-grid {
+.card-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.card-content {
+  padding: 24rpx;
+}
+
+/* 信息网格布局 */
+.info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24rpx;
 }
 
-.cargo-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.cargo-item.full-width {
-  grid-column: 1 / -1;
-}
-
-.cargo-item .label {
-  font-size: 28rpx;
-  color: #999;
-  margin-bottom: 8rpx;
-}
-
-.cargo-item .value {
-  font-size: 32rpx;
-  color: #333;
-}
-
-/* 提货和送货信息 */
 .info-item {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
   align-items: flex-start;
   margin-bottom: 16rpx;
+  flex-wrap: nowrap;
 }
 
-.info-item:last-child {
-  margin-bottom: 0;
-}
-
-.info-item .label {
+.label {
   font-size: 28rpx;
-  color: #999;
+  color: #999999;
   width: 160rpx;
   flex-shrink: 0;
 }
 
-.info-item .value {
-  flex: 1;
+.value {
   font-size: 32rpx;
-  color: #333;
-  text-align: right;
+  color: #333333;
+  flex: 1;
 }
 
-.info-item .value.long-text {
+.value.long-text {
   word-break: break-all;
 }
 
-/* 价格标签 */
-.price-tag {
-  font-size: 32rpx;
+.remark-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #f5f7fa;
+}
+
+/* 价格样式 */
+.price {
+  font-size: 36rpx;
   color: #ff4d4f;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 /* 底部价格栏 */
@@ -91,11 +87,9 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background: #fff;
-  padding: 24rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  box-shadow: 0 -2rpx 10rpx rgba(0,0,0,0.05);
-  box-sizing: border-box;
+  background: #ffffff;
+  padding: 20rpx 0 calc(24rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
 .price-item {
@@ -109,21 +103,10 @@
   margin-bottom: 0;
 }
 
-.price-label {
-  font-size: 28rpx;
-  color: #666;
-}
-
-.price-value {
-  font-size: 32rpx;
-  color: #ff4d4f;
-  font-weight: bold;
-}
-
-/* 价格调整器 */
 .stepper {
   display: flex;
   align-items: center;
+  gap: 20rpx;
 }
 
 .stepper-btn {
@@ -131,33 +114,38 @@
   height: 60rpx;
   line-height: 56rpx;
   text-align: center;
-  background: #f5f5f5;
-  color: #333;
-  font-size: 40rpx;
+  background: #f5f7fa;
   border-radius: 8rpx;
+  color: #333333;
+  font-size: 36rpx;
 }
 
 .stepper-value {
-  margin: 0 30rpx;
-  font-size: 32rpx;
-  color: #333;
   min-width: 80rpx;
   text-align: center;
+  font-size: 32rpx;
 }
 
-/* 底部操作区 */
 .bottom-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding-top: 20rpx;
-  border-top: 1rpx solid #eee;
+  border-top: 2rpx solid #f5f7fa;
 }
 
 .total-price-wrapper {
   display: flex;
   align-items: center;
   gap: 12rpx;
+}
+
+.price-label {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.price-value {
+  font-size: 36rpx;
+  color: #ff4d4f;
+  font-weight: 500;
 }
 
 .reupload-btn {
@@ -168,9 +156,196 @@
   color: #007AFF;
   background: #f0f8ff;
   border-radius: 32rpx;
+}
+
+/* 加载和错误状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200rpx;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #007AFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+.error-message {
+  padding: 30rpx;
+  text-align: center;
+  color: #ff4d4f;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 修改卡片内容样式使其更紧凑 */
+.card-content.compact {
+  padding: 16rpx 24rpx;
+}
+
+.compact .info-item {
+  margin-bottom: 12rpx;
+}
+
+.compact .info-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 价格行样式 */
+.price-row {
+  padding: 0 24rpx;
+  margin: 0 24rpx;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 24rpx;
+  margin-bottom: 24rpx;
+  border-bottom: 2rpx solid #f5f7fa;
+  box-sizing: border-box;
+}
+
+.price-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.price-col {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  min-width: 280rpx;
+}
+
+.price-control {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 0;
+  box-sizing: border-box;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.price-control .price-label {
+  margin-right: 8rpx;
+  font-size: 24rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.price-control .price-value {
+  min-width: 60rpx;
+  text-align: right;
+  font-size: 28rpx;
+  margin: 0 4rpx;
+}
+
+.price-row .stepper-btn {
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 42rpx;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+/* 总报价输入框样式 */
+.total-input-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.total-input-wrapper .price-control {
+  flex: 1;
+  justify-content: flex-start;
+  margin-left: 24rpx;
+}
+
+.total-input-wrapper .price-input.small {
+  width: 120rpx;
+}
+
+.price-input {
+  flex: 1;
+  height: 64rpx;
+  background: #f5f7fa;
+  border-radius: 8rpx;
+  padding: 0 24rpx;
+  font-size: 32rpx;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+/* 预估净得样式 */
+.net-profit-wrapper {
+  flex: 1;
+  margin-right: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.profit-main {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 8rpx;
+}
+
+.calculation-detail {
+  font-size: 18rpx;
+  color: #999999;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 调整按钮样式 */
+.reupload-btn {
+  min-width: 200rpx;
+  margin: 0;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+/* 调整第一行价格的间距 */
+.price-row:first-child {
+  padding-bottom: 20rpx;
+  margin-bottom: 20rpx;
+  justify-content: space-around;
+}
+
+/* 小型输入框样式 */
+.price-input.small {
+  width: 100rpx;
+  flex: none;
+  height: 48rpx;
+  padding: 0 12rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+/* 货物信息中的价格行样式调整 */
+.card .price-row {
+  margin: 0;
+  padding: 0;
   border: none;
 }
 
-.reupload-btn::after {
-  border: none;
+.card .price-col {
+  min-width: auto;
+  flex: 1;
+}
+
+.card .price-input.small {
+  background: transparent;
 }
