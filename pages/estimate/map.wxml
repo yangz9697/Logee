@@ -7,23 +7,12 @@
     scale="{{scale}}"
     markers="{{markers}}"
     polyline="{{polyline}}"
-    include-points="{{includePoints}}"
     show-location
   ></map>
-  <view class="info-panel">
-    <view class="route-info">
-      <text class="distance">总距离：{{distance}}</text>
-      <text class="duration">预计时间：{{duration}}</text>
-    </view>
-    <view class="address-info">
-      <view class="start">
-        <text class="label">起点：</text>
-        <text class="value">{{startAddress}}</text>
-      </view>
-      <view class="end">
-        <text class="label">终点：</text>
-        <text class="value">{{endAddress}}</text>
-      </view>
-    </view>
-  </view>
+  <van-cell-group custom-class="info-panel">
+    <van-cell title="总距离" value="{{distance}}" />
+    <van-cell title="预计时间" value="{{duration}}" />
+    <van-cell title="起点" value="{{startAddress}}" />
+    <van-cell title="终点" value="{{endAddress}}" />
+  </van-cell-group>
 </view> 

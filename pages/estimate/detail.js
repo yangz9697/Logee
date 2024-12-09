@@ -51,7 +51,7 @@ Page({
         destination: data.destination,
         imagePath: data.imagePath,
         ocrText: data.ocrText,
-        totalQuote: data.totalQuote.toString(),
+        totalQuote: (data.totalQuote || 2000).toString(),
         weight: data.weight,
         vehicleLength: data.vehicleLength + '米',
         transitPrice: data.transitPrice
@@ -163,28 +163,25 @@ Page({
     });
   },
 
-  onTotalQuoteChange(e) {
-    const value = e.detail.value.replace(/\D/g, '');
+  onTotalQuoteChange(event) {
     this.setData({
-      totalQuote: value
+      totalQuote: event.detail.toString()
     }, () => {
       this.calculateNetProfit();
     });
   },
 
-  onPickupPriceChange(e) {
-    const value = e.detail.value.replace(/\D/g, '');
+  onPickupPriceChange(event) {
     this.setData({
-      pickupPrice: value
+      pickupPrice: event.detail.toString()
     }, () => {
       this.calculateNetProfit();
     });
   },
 
-  onDeliveryPriceChange(e) {
-    const value = e.detail.value.replace(/\D/g, '');
+  onDeliveryPriceChange(event) {
     this.setData({
-      deliveryPrice: value
+      deliveryPrice: event.detail.toString()
     }, () => {
       this.calculateNetProfit();
     });
@@ -326,5 +323,33 @@ Page({
 
   onBack() {
     wx.navigateBack();
+  },
+
+  // 吨位变化
+  onWeightChange(event) {
+    const weight = event.detail;
+    this.setData({ weight }, () => {
+      if (this.data.loadingLocation && this.data.unloadingLocation) {
+        const pickupDistance = parseFloat(this.data.pickupDistance);
+        const deliveryDistance = parseFloat(this.data.deliveryDistance);
+        const pickupCost = this.calculateDeliveryCost(this.data.weight, pickupDistance);
+        const deliveryCost = this.calculateDeliveryCost(this.data.weight, deliveryDistance);
+        
+        this.setData({
+          pickupPrice: pickupCost.toString(),
+          deliveryPrice: deliveryCost.toString()
+        });
+      }
+      this.calculateNetProfit();
+    });
+  },
+
+  // 打托数变化
+  onPalletCountChange(event) {
+    this.setData({
+      palletCount: event.detail
+    }, () => {
+      this.calculateNetProfit();
+    });
   }
 }); 

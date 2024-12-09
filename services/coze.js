@@ -46,16 +46,16 @@ const cozeService = {
 
       const { loadingPlace, unloadingPlace, price, weight, vehicleLength } = result;
       
-      if (!loadingPlace || !unloadingPlace || !price || !weight || !vehicleLength) {
-        throw new Error('未能识别出完整信息');
+      if (!loadingPlace || !unloadingPlace) {
+        throw new Error('未能识别出装卸货地点');
       }
 
-      return { 
-        loadingPlace, 
+      return {
+        loadingPlace,
         unloadingPlace,
-        price,
-        weight,
-        vehicleLength
+        price: price || 0,
+        weight: weight || 0, 
+        vehicleLength: vehicleLength || 0
       };
     }
     throw new Error(response.data?.msg || '工作流调用失败');

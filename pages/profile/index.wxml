@@ -1,2 +1,7 @@
 <!--pages/profile/index.wxml-->
-<text>pages/profile/index.wxml</text>
+<view class="container">
+  <van-cell-group>
+    <van-cell title="我的" size="large" />
+    <van-cell title="功能开发中" label="敬请期待" />
+  </van-cell-group>
+</view>

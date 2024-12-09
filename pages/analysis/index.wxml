@@ -1,2 +1,7 @@
 <!--pages/analysis/index.wxml-->
-<text>pages/analysis/index.wxml</text>
+<view class="container">
+  <van-cell-group>
+    <van-cell title="线路分析" size="large" />
+    <van-cell title="功能开发中" label="敬请期待" />
+  </van-cell-group>
+</view>

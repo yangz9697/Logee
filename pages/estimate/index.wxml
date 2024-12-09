@@ -7,51 +7,83 @@
       src="{{tempImagePath}}" 
       mode="aspectFit"
     />
-    <view class="upload-area" wx:else bindtap="chooseImage">
-      <image class="upload-icon" src="/assets/icons/upload.png" />
-      <text class="upload-title">点击上传运满满截图</text>
-      <text class="upload-desc">支持jpg、png格式</text>
+    <view
+      wx:else 
+      class="upload-btn"
+      bindtap="chooseImage"
+    >
+      <view class="upload-content">
+        <van-icon name="photo-o" />
+        <text class="upload-title">点击上传运满满截图</text>
+        <text class="upload-desc">支持jpg、png格式</text>
+      </view>
     </view>
   </view>
-
+  <!-- Todo: 获取到ocr result后调用coze获取装卸货位置，提供手动选择位置，避免识别失败的情况 -->
   <!-- 底部固定区域 -->
   <view class="bottom-fixed">
     <!-- 站点选择区域 -->
-    <view class="station-section">
-      <!-- 始发城市 -->
-      <view class="city-select">
-        <text class="label">始发城市</text>
-        <radio-group class="radio-group" bindchange="onStartPointChange">
-          <label class="radio-item" wx:for="{{origins}}" wx:key="city">
-            <radio value="{{index}}" checked="{{startPointIndex == index}}" />
-            <text>{{item.city}}</text>
-          </label>
-        </radio-group>
-      </view>
-
-      <!-- 到达城市 -->
-      <view class="city-select">
-        <text class="label">到达城市</text>
-        <radio-group class="radio-group" bindchange="onEndPointChange">
-          <label class="radio-item" wx:for="{{destinations}}" wx:key="city">
-            <radio value="{{index}}" checked="{{endPointIndex == index}}" />
-            <text>{{item.city}}</text>
-          </label>
-        </radio-group>
-      </view>
+    <van-cell-group>
+      <van-cell class="station-row">
+        <view class="station-group">
+          <view class="station-label">始发站点</view>
+          <van-radio-group 
+            value="{{startPointIndex}}" 
+            bind:change="onStartPointChange"
+            direction="horizontal"
+            class="radio-group"
+          >
+            <van-radio
+              wx:for="{{origins}}"
+              wx:key="city"
+              name="{{index}}"
+              class="radio-item"
+            >{{item.city}}</van-radio>
+          </van-radio-group>
+        </view>
+        <view class="station-group">
+          <view class="station-label">到达站点</view>
+          <van-radio-group 
+            value="{{endPointIndex}}" 
+            bind:change="onEndPointChange"
+            direction="horizontal"
+            class="radio-group"
+          >
+            <van-radio
+              wx:for="{{destinations}}"
+              wx:key="city"
+              name="{{index}}"
+              class="radio-item"
+            >{{item.city}}</van-radio>
+          </van-radio-group>
+        </view>
+      </van-cell>
 
       <!-- 联运价格展示 -->
-      <view class="price-info" wx:if="{{currentPrice}}">
-        <text class="label">联运价格/吨</text>
-        <text class="price">¥{{currentPrice}}</text>
+      <view wx:if="{{currentPrice}}" class="transit-price">
+        <text>联运价格：</text>
+        <text>{{currentPrice}}元/吨</text>
       </view>
+    </van-cell-group>
 
-      <!-- 开始估价按钮 -->
-      <button 
-        class="next-btn" 
-        bindtap="onNextStep"
-        disabled="{{!canProceed}}"
-      >开始估价</button>
-    </view>
+    <!-- 开始估价按钮 -->
+    <van-button 
+      type="info" 
+      block 
+      disabled="{{!canProceed}}"
+      loading="{{isLoading}}"
+      bind:click="onNextStep"
+      custom-class="next-btn"
+    >开始估价</van-button>
   </view>
+
+  <!-- 选择器弹窗 -->
+  <van-popup show="{{showStartPicker}}" position="bottom" bind:close="onStartPickerClose">
+    <van-picker show-toolbar title="选择始发站点" columns="{{origins}}" value-key="city"
+      default-index="{{startPointIndex}}" bind:confirm="onStartPickerConfirm" bind:cancel="onStartPickerClose" />
+  </van-popup>
+  <van-popup show="{{showEndPicker}}" position="bottom" bind:close="onEndPickerClose">
+    <van-picker show-toolbar title="选择到达站点" columns="{{destinations}}" value-key="city"
+      default-index="{{endPointIndex}}" bind:confirm="onEndPickerConfirm" bind:cancel="onEndPickerClose" />
+  </van-popup>
 </view> 

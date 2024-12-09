@@ -1,134 +1,116 @@
 <view class="container">
-  <!-- 加载状态 -->
-  <view class="loading-container" wx:if="{{isLoading}}">
-    <view class="loading-spinner"></view>
-    <text>正在加载数据...</text>
-  </view>
+  <van-loading wx:if="{{isLoading}}" type="spinner" color="#007AFF" vertical>加载中...</van-loading>
 
-  <!-- 错误提示 -->
-  <view class="error-message" wx:if="{{errorMessage}}">
-    <text>{{errorMessage}}</text>
-    <button bindtap="onBack">返回重试</button>
-  </view>
+  <block wx:else>
+    <!-- 提货信息卡片 -->
+    <van-cell-group custom-class="card" bindtap="showPickupRoute">
+      <view class="card-header">
+        <text class="card-title">提货信息</text>
+        <text class="card-station">{{origin.name}}</text>
+      </view>
+      <van-cell title="装货地址" value="{{loadingAddress}}" />
+      <van-cell title="接货距离" value="{{pickupDistance}}" />
+    </van-cell-group>
 
-  <!-- 提货信息卡片 -->
-  <view class="card" bindtap="showPickupRoute">
-    <view class="card-header">
-      <text class="card-title">提货信息</text>
-    </view>
-    <view class="card-content compact">
-      <view class="info-item">
-        <text class="label">装货地址：</text>
-        <text class="value">{{loadingAddress}}</text>
+    <!-- 送货信息卡片 -->
+    <van-cell-group custom-class="card" bindtap="showDeliveryRoute">
+      <view class="card-header">
+        <text class="card-title">送货信息</text>
+        <text class="card-station">{{destination.name}}</text>
       </view>
-      <view class="info-item">
-        <text class="label">始发站点：</text>
-        <text class="value">{{origin.name}}</text>
-      </view>
-      <view class="info-item">
-        <text class="label">接货距离：</text>
-        <text class="value">{{pickupDistance}}</text>
-      </view>
-    </view>
-  </view>
+      <van-cell title="卸货地址" value="{{unloadingAddress}}" />
+      <van-cell title="送货距离" value="{{deliveryDistance}}" />
+    </van-cell-group>
 
-  <!-- 送货信息卡片 -->
-  <view class="card" bindtap="showDeliveryRoute">
-    <view class="card-header">
-      <text class="card-title">送货信息</text>
-    </view>
-    <view class="card-content compact">
-      <view class="info-item">
-        <text class="label">目的站点：</text>
-        <text class="value">{{destination.name}}</text>
+    <!-- 底部价格栏 -->
+    <view class="bottom-bar">
+      <!-- 吨位 -->
+      <view class="price-item">
+        <text class="price-label">吨位</text>
+        <van-stepper
+          value="{{weight}}"
+          step="0.1"
+          decimal-length="1"
+          min="0.1"
+          input-width="220rpx"
+          button-size="56rpx"
+          bind:change="onWeightChange"
+        />
       </view>
-      <view class="info-item">
-        <text class="label">卸货地址：</text>
-        <text class="value">{{unloadingAddress}}</text>
+      
+      <!-- 打托数 -->
+      <view class="price-item">
+        <text class="price-label">打托数</text>
+        <van-stepper
+          value="{{palletCount}}"
+          integer
+          min="0"
+          input-width="220rpx"
+          button-size="56rpx"
+          bind:change="onPalletCountChange"
+        />
       </view>
-      <view class="info-item">
-        <text class="label">送货距离：</text>
-        <text class="value">{{deliveryDistance}}</text>
-      </view>
-    </view>
-  </view>
 
-  <!-- 货物信息卡片 -->
-  <view class="card">
-    <view class="card-header">
-      <text class="card-title">货物信息</text>
-    </view>
-    <view class="card-content compact">
-      <view class="price-row">
-        <view class="price-col">
-          <view class="price-control">
-            <text class="price-label">吨位</text>
-            <text class="stepper-btn" bindtap="decreaseWeight">-</text>
-            <input class="price-input small" value="{{weight}}吨" disabled />
-            <text class="stepper-btn" bindtap="increaseWeight">+</text>
-          </view>
-        </view>
-        <view class="price-col">
-          <view class="price-control">
-            <text class="price-label">打托数</text>
-            <text class="stepper-btn" bindtap="decreasePalletCount">-</text>
-            <input class="price-input small" value="{{palletCount}}托" disabled />
-            <text class="stepper-btn" bindtap="increasePalletCount">+</text>
-          </view>
-        </view>
+      <!-- 提货费用 -->
+      <view class="price-item">
+        <text class="price-label">提货费用</text>
+        <van-stepper
+          value="{{pickupPrice}}"
+          integer
+          step="10"
+          min="0"
+          input-width="220rpx"
+          button-size="56rpx"
+          bind:change="onPickupPriceChange"
+        />
       </view>
-      <!-- <view class="info-item">
-        <text class="label">占用车长：</text>
-        <text class="value">{{vehicleLength}}</text>
-      </view> -->
-    </view>
-  </view>
-  <!-- 底部价格栏 -->
-  <view class="bottom-bar">
-    <!-- 提送货价格 -->
-    <view class="price-row">
-      <view class="price-col">
-        <view class="price-control">
-          <text class="price-label">提货费用</text>
-          <text class="stepper-btn" bindtap="decreasePickupPrice">-</text>
-          <input class="price-input small" type="number" value="{{pickupPrice}}" bindinput="onPickupPriceChange" />
-          <text class="stepper-btn" bindtap="increasePickupPrice">+</text>
-        </view>
-      </view>
-      <view class="price-col">
-        <view class="price-control">
-          <text class="price-label">送货费用</text>
-          <text class="stepper-btn" bindtap="decreaseDeliveryPrice">-</text>
-          <input class="price-input small" type="number" value="{{deliveryPrice}}" bindinput="onDeliveryPriceChange" />
-          <text class="stepper-btn" bindtap="increaseDeliveryPrice">+</text>
-        </view>
-      </view>
-    </view>
 
-    <!-- 总报价输入 -->
-    <view class="price-row">
-      <view class="total-input-wrapper">
+      <!-- 送货费用 -->
+      <view class="price-item">
+        <text class="price-label">送货费用</text>
+        <van-stepper
+          value="{{deliveryPrice}}"
+          integer
+          step="10"
+          min="0"
+          input-width="220rpx"
+          button-size="56rpx"
+          bind:change="onDeliveryPriceChange"
+        />
+      </view>
+
+      <!-- 总报价 -->
+      <view class="price-item">
         <text class="price-label">总报价</text>
-        <view class="price-control">
-          <text class="stepper-btn" bindtap="decreaseTotalQuote">-</text>
-          <input class="price-input small" type="number" value="{{totalQuote}}" bindinput="onTotalQuoteChange" />
-          <text class="stepper-btn" bindtap="increaseTotalQuote">+</text>
-        </view>
+        <van-stepper
+          value="{{totalQuote}}"
+          integer
+          step="100"
+          min="0"
+          input-width="220rpx"
+          button-size="56rpx"
+          bind:change="onTotalQuoteChange"
+        />
       </view>
-    </view>
 
-    <!-- 预估净得按钮 -->
-    <view class="price-row last-row">
-      <view class="net-profit-wrapper">
-        <view class="profit-main">
-          <text class="price-label">预估净得</text>
-          <text class="price-value">¥{{netProfit}}</text>
+      <!-- 预估净得 -->
+      <view class="bottom-row">
+        <view class="net-profit">
+          <text class="label">预估净得</text>
+          <text class="value">¥{{netProfit}}</text>
         </view>
-        <text class="calculation-detail">
-          计算过程：{{totalQuote}}-{{pickupPrice}}-{{transitPrice}}×{{weight}}-{{deliveryPrice}}-{{palletCount}}×30
-        </text>
+        <van-button 
+          custom-class="reupload-btn" 
+          type="info" 
+          plain 
+          bind:click="onBack"
+        >再次使用估价</van-button>
       </view>
-      <button class="reupload-btn" bindtap="onBack">再次使用估价</button>
+
+      <!-- 计算过程 -->
+      <view class="calculation">
+        <text class="detail">计算过程：{{totalQuote}}-{{pickupPrice}}-{{transitPrice}}×{{weight}}-{{deliveryPrice}}-{{palletCount}}×30</text>
+      </view>
     </view>
-  </view>
+  </block>
 </view> 

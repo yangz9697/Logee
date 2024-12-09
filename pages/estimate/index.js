@@ -1,6 +1,7 @@
 const { origins } = require('../../constants/stations');
 const ocrService = require('../../services/ocr');
 const cozeService = require('../../services/coze');
+import Toast from '@vant/weapp/toast/toast';
 
 Page({
   data: {
@@ -14,7 +15,9 @@ Page({
     canProceed: false,
     ocrSuccess: false,
     isLoading: false,
-    ocrText: ''
+    ocrText: '',
+    showStartPicker: false,
+    showEndPicker: false
   },
 
   onLoad() {
@@ -44,7 +47,11 @@ Page({
         
         // 开始OCR识别
         try {
-          wx.showLoading({ title: '正在识别中...' });
+          Toast.loading({
+            message: '正在识别中...',
+            forbidClick: true,
+            duration: 0
+          });
           
           // 调用OCR识别
           const ocrResult = await ocrService.recognizeImage(tempFilePath);
@@ -64,17 +71,11 @@ Page({
             ocrText: textResult  // 保存OCR结果
           });
           
-          wx.showToast({
-            title: '识别成功',
-            icon: 'success'
-          });
+          Toast.success('识别成功');
 
         } catch (error) {
           console.error('OCR识别失败:', error);
-          wx.showToast({
-            title: error.message || '识别失败',
-            icon: 'none'
-          });
+          Toast.fail(error.message || '识别失败');
           
           this.setData({
             tempImagePath: '',
@@ -83,15 +84,15 @@ Page({
             ocrText: ''  // 清空OCR结果
           });
         } finally {
-          wx.hideLoading();
+          Toast.clear();
         }
       }
     });
   },
 
-  // 选择始发站点
+  // 恢复 radio 相关方法
   onStartPointChange(e) {
-    const index = parseInt(e.detail.value);
+    const index = parseInt(e.detail);
     const selectedOrigin = this.data.origins[index];
     
     this.setData({
@@ -103,10 +104,9 @@ Page({
     });
     this.checkCanProceed();
   },
-
-  // 选择目的站点
+  
   onEndPointChange(e) {
-    const index = parseInt(e.detail.value);
+    const index = parseInt(e.detail);
     const selectedDestination = this.data.destinations[index];
     
     this.setData({
@@ -139,6 +139,7 @@ Page({
       wx.showLoading({ title: '正在分析数据...' });
 
       // 使用现有的 callWorkflow 方法分析文本
+      console.log('开始分析文本:', this.data.ocrText);
       const response = await cozeService.callWorkflow(this.data.ocrText);
       const result = await cozeService.handleResponse(response);
 
