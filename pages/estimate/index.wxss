@@ -10,7 +10,7 @@ page {
 }
 
 .upload-section {
-  min-height: 480rpx;
+  min-height: 360rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,13 +26,13 @@ page {
 
 .preview-image {
   width: 100%;
-  height: 600rpx;
+  height: 400rpx;
   border-radius: 8rpx;
 }
 
 .upload-btn {
   width: 100% !important;
-  min-height: 480rpx !important;
+  min-height: 360rpx !important;
   background: #ffffff;
   border: 2rpx dashed #e8e8e8;
   border-radius: 8rpx;
@@ -68,12 +68,12 @@ page {
 
 .bottom-fixed {
   margin-top: auto;
-  padding: 32rpx;
+  padding: 24rpx;
   background: #ffffff;
 }
 
 .transit-price {
-  padding: 16rpx 32rpx;
+  padding: 12rpx 32rpx;
   font-size: 28rpx;
   color: #969799;
   display: flex;
@@ -94,14 +94,14 @@ page {
 }
 
 .station-row {
-  padding: 28rpx 32rpx !important;
+  padding: 20rpx 32rpx !important;
 }
 
 .station-group {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 28rpx;
+  margin-bottom: 20rpx;
 }
 
 .station-group:last-child {
@@ -111,45 +111,7 @@ page {
 .station-label {
   font-size: 32rpx;
   color: #646566;
-  margin-bottom: 20rpx;
-}
-
-.radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 48rpx;
-}
-
-.radio-item {
-  margin: 0 !important;
-  padding: 16rpx 0 !important;
-}
-
-.van-radio__label {
-  color: #323233 !important;
-  font-size: 32rpx !important;
-  padding-left: 8rpx !important;
-}
-
-.van-radio__icon {
-  font-size: 36rpx !important;
-}
-
-.van-radio__icon--checked {
-  background-color: #007AFF !important;
-  border-color: #007AFF !important;
-  color: #ffffff !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border-radius: 999px !important;
-  width: 44rpx !important;
-  height: 44rpx !important;
-}
-
-.van-radio__icon--checked .van-icon {
-  color: #ffffff !important;
-  font-size: 28rpx !important;
+  margin-bottom: 16rpx;
 }
 
 .van-icon-photo-o {
@@ -159,8 +121,195 @@ page {
 }
 
 .next-btn {
-  margin-top: 32rpx !important;
+  margin-top: 24rpx !important;
   height: 88rpx !important;
   line-height: 88rpx !important;
   font-size: 32rpx !important;
-} 
+}
+
+/* OCR识别结果样式 */
+.ocr-result {
+  margin: 0 24rpx 24rpx;
+  padding: 24rpx;
+  background: #ffffff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.ocr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.ocr-title {
+  font-size: 28rpx;
+  color: #323233;
+  font-weight: 500;
+}
+
+.ocr-expand {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 26rpx;
+  color: #969799;
+}
+
+.ocr-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 26rpx;
+  color: #646566;
+  line-height: 1.6;
+}
+
+.ocr-text.expanded {
+  -webkit-line-clamp: unset;
+}
+
+.station-section {
+  padding: 20rpx 32rpx;
+}
+
+.station-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+/* 地址输入区域样式 */
+.address-section {
+  margin: 0 24rpx 24rpx;
+  padding: 24rpx;
+  background: #ffffff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.address-item {
+  position: relative;
+  margin-bottom: 24rpx;
+}
+
+.address-item:last-child {
+  margin-bottom: 0;
+}
+
+.address-label {
+  display: block;
+  font-size: 28rpx;
+  color: #323233;
+  margin-bottom: 12rpx;
+}
+
+.address-input-wrap {
+  position: relative;
+}
+
+.address-input {
+  width: 100%;
+  height: 72rpx;
+  padding: 0 24rpx;
+  background: #f7f8fa;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #323233;
+}
+
+.address-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: 24rpx;
+  border-bottom: 2rpx solid #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.suggestion-item:active {
+  background: #f7f8fa;
+}
+
+.suggestion-name {
+  font-size: 28rpx;
+  color: #323233;
+}
+
+.suggestion-district {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+/* 目的地网格布局 */
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+  width: 100%;
+}
+
+.grid-item {
+  background: #f7f8fa;
+  border-radius: 8rpx;
+  padding: 20rpx 16rpx;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.grid-item.active {
+  background: #e8f3ff;
+  color: #007AFF;
+}
+
+.city-name {
+  font-size: 28rpx;
+}
+
+/* 模式切换样式 */
+.mode-switch {
+  display: flex;
+  padding: 24rpx 32rpx 4rpx;
+}
+
+.mode-item {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  color: #646566;
+  position: relative;
+  transition: all 0.3s;
+  margin: 0 12rpx;
+}
+
+.mode-item.active {
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.mode-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4rpx;
+  background: #007AFF;
+  border-radius: 2rpx;
+}

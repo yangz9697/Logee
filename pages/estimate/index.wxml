@@ -19,52 +19,127 @@
       </view>
     </view>
   </view>
-  <!-- Todo: 获取到ocr result后调用coze获取装卸货位置，提供手动选择位置，避免识别失败的情况 -->
+
+  <!-- OCR识别结果展示 -->
+  <view wx:if="{{showAddressSelection}}" class="ocr-result">
+    <view class="ocr-header">
+      <text class="ocr-title">识别结果</text>
+      <view class="ocr-expand" bindtap="toggleExpand">
+        <text>{{isExpanded ? '收起' : '展开'}}</text>
+        <van-icon name="{{isExpanded ? 'arrow-up' : 'arrow-down'}}" />
+      </view>
+    </view>
+    <text user-select class="ocr-text {{isExpanded ? 'expanded' : ''}}">{{ocrText}}</text>
+  </view>
+
+  <!-- 装卸货地址输入 -->
+  <view class="address-section" wx:if="{{showAddressSelection}}">
+    <view class="address-item">
+      <text class="address-label">装货地址</text>
+      <view class="address-input-wrap">
+        <input 
+          class="address-input"
+          value="{{loadingAddress}}"
+          placeholder="请输入装货地址"
+          bindinput="onLoadingAddressInput"
+          focus="{{loadingFocus}}"
+        />
+        <view class="address-suggestions" wx:if="{{loadingSuggestions.length > 0}}">
+          <view 
+            class="suggestion-item"
+            wx:for="{{loadingSuggestions}}"
+            wx:key="id"
+            bindtap="selectLoadingAddress"
+            data-suggestion="{{item}}"
+            catch:touchstart="preventBlur"
+          >
+            <text class="suggestion-name">{{item.name}}</text>
+            <text class="suggestion-district">{{item.district}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="address-item">
+      <text class="address-label">卸货地址</text>
+      <view class="address-input-wrap">
+        <input 
+          class="address-input"
+          value="{{unloadingAddress}}"
+          placeholder="请输入卸货地址"
+          bindinput="onUnloadingAddressInput"
+          focus="{{unloadingFocus}}"
+        />
+        <view class="address-suggestions" wx:if="{{unloadingSuggestions.length > 0}}">
+          <view 
+            class="suggestion-item"
+            wx:for="{{unloadingSuggestions}}"
+            wx:key="id"
+            bindtap="selectUnloadingAddress"
+            data-suggestion="{{item}}"
+            catch:touchstart="preventBlur"
+          >
+            <text class="suggestion-name">{{item.name}}</text>
+            <text class="suggestion-district">{{item.district}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 底部固定区域 -->
   <view class="bottom-fixed">
-    <!-- 站点选择区域 -->
-    <van-cell-group>
-      <van-cell class="station-row">
-        <view class="station-group">
-          <view class="station-label">始发站点</view>
-          <van-radio-group 
-            value="{{startPointIndex}}" 
-            bind:change="onStartPointChange"
-            direction="horizontal"
-            class="radio-group"
-          >
-            <van-radio
-              wx:for="{{origins}}"
-              wx:key="city"
-              name="{{index}}"
-              class="radio-item"
-            >{{item.city}}</van-radio>
-          </van-radio-group>
-        </view>
-        <view class="station-group">
-          <view class="station-label">到达站点</view>
-          <van-radio-group 
-            value="{{endPointIndex}}" 
-            bind:change="onEndPointChange"
-            direction="horizontal"
-            class="radio-group"
-          >
-            <van-radio
-              wx:for="{{destinations}}"
-              wx:key="city"
-              name="{{index}}"
-              class="radio-item"
-            >{{item.city}}</van-radio>
-          </van-radio-group>
-        </view>
-      </van-cell>
+    <!-- 模式切换 -->
+    <view class="mode-switch">
+      <view 
+        class="mode-item {{mode === 'all' ? 'active' : ''}}" 
+        bindtap="switchMode" 
+        data-mode="all"
+      >广东主线</view>
+      <view 
+        class="mode-item {{mode === 'xian' ? 'active' : ''}}" 
+        bindtap="switchMode" 
+        data-mode="xian"
+      >西安专线</view>
+    </view>
 
-      <!-- 联运价格展示 -->
-      <view wx:if="{{currentPrice}}" class="transit-price">
-        <text>联运价格：</text>
-        <text>{{currentPrice}}元/吨</text>
+    <!-- 站点选择区域 -->
+    <view class="station-section">
+      <view class="station-group">
+        <view class="station-label">始发站点</view>
+        <view class="destination-grid">
+          <view
+            wx:for="{{currentLines}}"
+            wx:key="city"
+            class="grid-item {{startPointIndex === index ? 'active' : ''}}"
+            bindtap="onStartPointChange"
+            data-index="{{index}}"
+          >
+            <text class="city-name">{{item.city}}</text>
+          </view>
+        </view>
       </view>
-    </van-cell-group>
+      <view class="station-group">
+        <view class="station-label">到达站点</view>
+        <view class="destination-grid">
+          <view
+            wx:for="{{destinations}}"
+            wx:key="city"
+            class="grid-item {{endPointIndex === index ? 'active' : ''}}"
+            bindtap="onEndPointChange"
+            data-index="{{index}}"
+          >
+            <text class="city-name">{{item.city}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联运价格展示 -->
+    <!-- <view wx:if="{{currentPrice}}" class="transit-price">
+      <text>联运价格：</text>
+      <text>{{currentPrice}}元/吨</text>
+    </view> -->
 
     <!-- 开始估价按钮 -->
     <van-button 

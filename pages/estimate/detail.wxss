@@ -79,6 +79,28 @@
   z-index: 100;
 }
 
+/* 建议报价样式 */
+.suggest-price {
+  padding: 32rpx;
+  text-align: center;
+  background: #f0f9ff;
+  border-bottom: 2rpx solid #e8f4ff;
+}
+
+.suggest-price .label {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.suggest-price .value {
+  font-size: 48rpx;
+  color: #007AFF;
+  font-weight: 500;
+  display: block;
+}
+
 /* 价格项样式 */
 .price-item {
   display: flex;
@@ -90,29 +112,6 @@
 .price-label {
   font-size: 28rpx;
   color: #646566;
-}
-
-/* 货物信息项样式 */
-.price-item:nth-child(-n+2) {
-  padding: 20rpx 32rpx;
-  background: #f7f8fa;
-}
-
-.price-item:nth-child(-n+2) .price-label {
-  font-size: 26rpx;
-  color: #969799;
-}
-
-.price-item:nth-child(-n+2) .van-stepper__input {
-  background-color: #ffffff !important;
-  font-size: 26rpx !important;
-}
-
-.price-item:nth-child(-n+2) .van-stepper__minus,
-.price-item:nth-child(-n+2) .van-stepper__plus {
-  background-color: #ffffff !important;
-  width: 48rpx !important;
-  height: 48rpx !important;
 }
 
 /* 步进器样式 */
@@ -143,48 +142,16 @@
   color: #c8c9cc !important;
 }
 
-/* 底部行样式 */
-.bottom-row {
+/* 按钮行样式 */
+.button-row {
   padding: 28rpx 32rpx;
   border-top: 2rpx solid #f5f7fa;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: -28rpx;
-}
-
-/* 预净得样式 */
-.net-profit {
-  display: flex;
-  flex-direction: column;
-}
-
-.net-profit .label {
-  font-size: 28rpx;
-  color: #666666;
-  margin-bottom: 8rpx;
-}
-
-.net-profit .value {
-  font-size: 36rpx;
-  color: #ff4d4f;
-  font-weight: 500;
-}
-
-/* 计算过程样式 */
-.calculation {
-  padding: 0 32rpx 16rpx;
-}
-
-.calculation .detail {
-  font-size: 24rpx;
-  color: #999999;
-  line-height: 1.4;
+  text-align: center;
 }
 
 /* 按钮样式 */
 .reupload-btn {
-  min-width: 200rpx !important;
+  width: 320rpx !important;
   height: 72rpx !important;
   line-height: 70rpx !important;
 }

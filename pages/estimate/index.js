@@ -1,12 +1,15 @@
-const { origins } = require('../../constants/stations');
+const { origins, xianLines } = require('../../constants/stations');
 const ocrService = require('../../services/ocr');
 const cozeService = require('../../services/coze');
+const amapService = require('../../services/amap');
+const roleService = require('../../services/role');
 import Toast from '@vant/weapp/toast/toast';
 
 Page({
   data: {
     tempImagePath: '',
-    origins,
+    origins: origins,
+    xianLines: xianLines,
     destinations: [],
     startPointIndex: 0,
     endPointIndex: 0,
@@ -16,11 +19,23 @@ Page({
     ocrSuccess: false,
     isLoading: false,
     ocrText: '',
-    showStartPicker: false,
-    showEndPicker: false
+    isExpanded: false,
+    loadingAddress: '',
+    unloadingAddress: '',
+    loadingSuggestions: [],
+    unloadingSuggestions: [],
+    loadingLocation: null,
+    unloadingLocation: null,
+    showAddressSelection: false,
+    analysisResult: null,
+    roles: [],
+    loadingFocus: false,
+    unloadingFocus: false,
+    mode: 'all',  // 'all' 或 'xian'
+    currentLines: origins
   },
 
-  onLoad() {
+  async onLoad() {
     // 初始化目的站点列表和价格
     const selectedOrigin = this.data.origins[0];
     this.setData({
@@ -29,6 +44,23 @@ Page({
       currentPrice: selectedOrigin.destinations[0].price
     });
     this.checkCanProceed();
+
+    // 获取角色列表
+    // try {
+    //   const roles = await roleService.getRoles();
+    //   console.log('获取到的角色列表:', roles);
+    //   this.setData({ roles });
+    // } catch (error) {
+    //   console.error('获取角色列表失败:', error);
+    //   Toast.fail('获取角色列表失败');
+    // }
+  },
+
+  // 切换展开/收起
+  toggleExpand() {
+    this.setData({
+      isExpanded: !this.data.isExpanded
+    });
   },
 
   // 选择图片
@@ -58,17 +90,17 @@ Page({
           const textResult = ocrResult?.data?.ocr_comm_res?.items
             ?.map(item => item.text)
             .filter(Boolean)
-            .join('\n');
+            .join(' ');
 
           if (!textResult) {
-            throw new Error('未能识别出文字');
+            throw new Error('未能识别出字');
           }
 
           // OCR识别成功，保存识别结果
           this.setData({
             ocrSuccess: true,
             canProceed: true,
-            ocrText: textResult  // 保存OCR结果
+            ocrText: textResult.replace(/\s+/g, ' ').trim()
           });
           
           Toast.success('识别成功');
@@ -81,7 +113,7 @@ Page({
             tempImagePath: '',
             ocrSuccess: false,
             canProceed: false,
-            ocrText: ''  // 清空OCR结果
+            ocrText: ''
           });
         } finally {
           Toast.clear();
@@ -92,21 +124,21 @@ Page({
 
   // 恢复 radio 相关方法
   onStartPointChange(e) {
-    const index = parseInt(e.detail);
-    const selectedOrigin = this.data.origins[index];
+    const index = parseInt(e.currentTarget.dataset.index);
+    const selectedOrigin = this.data.currentLines[index];
     
     this.setData({
       startPointIndex: index,
       selectedOrigin,
-      destinations: selectedOrigin.destinations,
+      destinations: this.data.mode === 'all' ? selectedOrigin.destinations : [selectedOrigin.destination[0]],
       endPointIndex: 0,
-      currentPrice: selectedOrigin.destinations[0].price
+      currentPrice: this.data.mode === 'all' ? selectedOrigin.destinations[0].price : selectedOrigin.destination[0].price
     });
     this.checkCanProceed();
   },
   
   onEndPointChange(e) {
-    const index = parseInt(e.detail);
+    const index = parseInt(e.currentTarget.dataset.index);
     const selectedDestination = this.data.destinations[index];
     
     this.setData({
@@ -133,7 +165,7 @@ Page({
 
   // 下一步
   async onNextStep() {
-    if (!this.data.canProceed) return;
+    if (!this.data.ocrSuccess) return;
 
     try {
       wx.showLoading({ title: '正在分析数据...' });
@@ -143,25 +175,42 @@ Page({
       const response = await cozeService.callWorkflow(this.data.ocrText);
       const result = await cozeService.handleResponse(response);
 
-      // 跳转到详情页
-      const { selectedOrigin, destinations, endPointIndex, tempImagePath, ocrText } = this.data;
-      const selectedDestination = destinations[endPointIndex];
+      // 搜索装卸货地址的高德地图位置
+      let loadingLocation = null;
+      let unloadingLocation = null;
+      
+      try {
+        // 搜索装货地址
+        const loadingResults = await amapService.searchPOI(result.loadingPlace);
+        if (loadingResults && loadingResults.length > 0) {
+          loadingLocation = loadingResults[0];
+        }
+        
+        // 搜索卸货地址
+        const unloadingResults = await amapService.searchPOI(result.unloadingPlace);
+        if (unloadingResults && unloadingResults.length > 0) {
+          unloadingLocation = unloadingResults[0];
+        }
+      } catch (error) {
+        console.error('地址搜索失败:', error);
+      }
 
-      // 将数据编码为URL参数
-      wx.navigateTo({
-        url: `/pages/estimate/detail?data=${encodeURIComponent(JSON.stringify({
-          origin: selectedOrigin,
-          destination: selectedDestination,
-          imagePath: tempImagePath,
-          ocrText,
+      // 如果有任一地址未找到,显示手动选择界面
+      if (!loadingLocation || !unloadingLocation) {
+        this.setData({
+          tempImagePath: '',
           loadingAddress: result.loadingPlace,
           unloadingAddress: result.unloadingPlace,
-          totalQuote: result.price,
-          weight: result.weight,
-          transitPrice: this.data.currentPrice,
-          vehicleLength: result.vehicleLength
-        }))}`,
-      });
+          showAddressSelection: true,
+          analysisResult: result
+        });
+        wx.hideLoading();
+        Toast('请确认装卸货地址');
+        return;
+      }
+
+      // 如果都找到了地址,直接跳转详情页
+      this.navigateToDetail(loadingLocation, unloadingLocation, result);
 
     } catch (error) {
       console.error('数据分析失败:', error);
@@ -172,6 +221,29 @@ Page({
     } finally {
       wx.hideLoading();
     }
+  },
+
+  // 跳转到详情页
+  navigateToDetail(loadingLocation, unloadingLocation, result) {
+    const { selectedOrigin, destinations, endPointIndex, tempImagePath, ocrText } = this.data;
+    const selectedDestination = destinations[endPointIndex];
+
+    wx.navigateTo({
+      url: `/pages/estimate/detail?data=${encodeURIComponent(JSON.stringify({
+        origin: selectedOrigin,
+        destination: selectedDestination,
+        imagePath: tempImagePath,
+        ocrText,
+        loadingAddress: loadingLocation.name,
+        unloadingAddress: unloadingLocation.name,
+        loadingLocation,
+        unloadingLocation,
+        totalQuote: result.price,
+        weight: result.weight,
+        transitPrice: this.data.currentPrice,
+        vehicleLength: result.vehicleLength
+      }))}`,
+    });
   },
 
   // 添加统一的错误处理方法
@@ -189,6 +261,113 @@ Page({
       tempImagePath: '',
       ocrSuccess: false,
       canProceed: false
+    });
+  },
+
+  // 装货地址输入
+  onLoadingAddressInput(e) {
+    const address = e.detail.value;
+    this.setData({ 
+      loadingAddress: address,
+      loadingFocus: true
+    });
+    if (address) {
+      this.searchAddress(address, 'loading');
+    } else {
+      this.setData({ loadingSuggestions: [] });
+    }
+  },
+
+  // 卸货地址输入
+  onUnloadingAddressInput(e) {
+    const address = e.detail.value;
+    this.setData({ 
+      unloadingAddress: address,
+      unloadingFocus: true 
+    });
+    if (address) {
+      this.searchAddress(address, 'unloading');
+    } else {
+      this.setData({ unloadingSuggestions: [] });
+    }
+  },
+
+  // 搜索地址
+  async searchAddress(keyword, type) {
+    try {
+      const suggestions = await amapService.searchPOI(keyword);
+      this.setData({
+        [`${type}Suggestions`]: suggestions
+      });
+    } catch (error) {
+      console.error('搜索地址失败:', error);
+      this.setData({
+        [`${type}Suggestions`]: []
+      });
+    }
+  },
+
+  // 选择装货地址
+  selectLoadingAddress(e) {
+    const suggestion = e.currentTarget.dataset.suggestion;
+    this.setData({
+      loadingAddress: suggestion.name,
+      loadingSuggestions: [],
+      loadingFocus: false,
+      loadingLocation: {
+        latitude: suggestion.location.lat,
+        longitude: suggestion.location.lng
+      }
+    }, () => {
+      this.checkCanProceed();
+      this.tryNavigateToDetail();
+    });
+  },
+
+  // 选择卸货地址
+  selectUnloadingAddress(e) {
+    const suggestion = e.currentTarget.dataset.suggestion;
+    this.setData({
+      unloadingAddress: suggestion.name,
+      unloadingSuggestions: [],
+      unloadingFocus: false,
+      unloadingLocation: {
+        latitude: suggestion.location.lat,
+        longitude: suggestion.location.lng
+      }
+    }, () => {
+      this.checkCanProceed();
+      this.tryNavigateToDetail();
+    });
+  },
+
+  // 尝试跳转到详情页
+  tryNavigateToDetail() {
+    const { loadingLocation, unloadingLocation, analysisResult } = this.data;
+    if (loadingLocation && unloadingLocation && analysisResult) {
+      this.navigateToDetail(loadingLocation, unloadingLocation, analysisResult);
+    }
+  },
+
+  // 防止触摸建议项时输入框失焦
+  preventBlur() {
+    return;
+  },
+
+  // 切换模式
+  switchMode(e) {
+    const mode = e.currentTarget.dataset.mode;
+    const currentLines = mode === 'all' ? this.data.origins : this.data.xianLines;
+    const selectedOrigin = currentLines[0];
+    
+    this.setData({
+      mode,
+      currentLines,
+      startPointIndex: 0,
+      selectedOrigin,
+      destinations: mode === 'all' ? selectedOrigin.destinations : [selectedOrigin.destination[0]],
+      endPointIndex: 0,
+      currentPrice: mode === 'all' ? selectedOrigin.destinations[0].price : selectedOrigin.destination[0].price
     });
   }
 }); 

@@ -25,8 +25,7 @@ Page({
     isLoading: false,
     errorMessage: '',
     useMock: USE_MOCK,
-    totalQuote: '0',
-    netProfit: '0',
+    suggestPrice: '0',
     palletCount: 0
   },
 
@@ -39,7 +38,7 @@ Page({
           ...MOCK_RESPONSE
         }, () => {
           this.calculateTransitTotal();
-          this.calculateNetProfit();
+          this.calculateSuggestPrice();
         });
         return;
       }
@@ -51,7 +50,7 @@ Page({
         destination: data.destination,
         imagePath: data.imagePath,
         ocrText: data.ocrText,
-        totalQuote: (data.totalQuote || 2000).toString(),
+        suggestPrice: (data.totalQuote || 2000).toString(),
         weight: data.weight,
         vehicleLength: data.vehicleLength + '米',
         transitPrice: data.transitPrice
@@ -129,7 +128,7 @@ Page({
       pickupPrice: data.pickupPrice,
       deliveryPrice: data.deliveryPrice
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -148,26 +147,24 @@ Page({
     });
   },
 
-  calculateNetProfit() {
-    const totalQuote = parseInt(this.data.totalQuote) || 0;
+  calculateSuggestPrice() {
+    const pickupPrice = parseInt(this.data.pickupPrice) || 0;
+    const deliveryPrice = parseInt(this.data.deliveryPrice) || 0;
     const transitCost = this.data.transitPrice * this.data.weight;
-    const palletCost = this.data.palletCount * 30;
-    const totalCost = transitCost + 
-      (parseInt(this.data.pickupPrice) || 0) + 
-      (parseInt(this.data.deliveryPrice) || 0) +
-      palletCost;
-    const netProfit = totalQuote - totalCost;
+    const suggestPrice = pickupPrice + deliveryPrice + transitCost + 400;
+
+    const roundedPrice = Math.ceil(suggestPrice / 50) * 50;
 
     this.setData({
-      netProfit: Math.round(netProfit).toString()
+      suggestPrice: roundedPrice.toString()
     });
   },
 
   onTotalQuoteChange(event) {
     this.setData({
-      totalQuote: event.detail.toString()
+      suggestPrice: event.detail.toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -175,7 +172,7 @@ Page({
     this.setData({
       pickupPrice: event.detail.toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -183,7 +180,7 @@ Page({
     this.setData({
       deliveryPrice: event.detail.toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -191,7 +188,7 @@ Page({
     this.setData({
       pickupPrice: (parseInt(this.data.pickupPrice) + 10).toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -199,7 +196,7 @@ Page({
     this.setData({
       pickupPrice: Math.max(0, parseInt(this.data.pickupPrice) - 10).toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -207,7 +204,7 @@ Page({
     this.setData({
       deliveryPrice: (parseInt(this.data.deliveryPrice) + 10).toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -215,7 +212,7 @@ Page({
     this.setData({
       deliveryPrice: Math.max(0, parseInt(this.data.deliveryPrice) - 10).toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -234,7 +231,7 @@ Page({
           deliveryPrice: deliveryCost.toString()
         });
       }
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -253,23 +250,23 @@ Page({
           deliveryPrice: deliveryCost.toString()
         });
       }
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
   increaseTotalQuote() {
     this.setData({
-      totalQuote: (parseInt(this.data.totalQuote) + 100).toString()
+      suggestPrice: (parseInt(this.data.suggestPrice) + 100).toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
   decreaseTotalQuote() {
     this.setData({
-      totalQuote: Math.max(0, parseInt(this.data.totalQuote) - 100).toString()
+      suggestPrice: Math.max(0, parseInt(this.data.suggestPrice) - 100).toString()
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -277,7 +274,7 @@ Page({
     this.setData({
       palletCount: this.data.palletCount + 1
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -285,7 +282,7 @@ Page({
     this.setData({
       palletCount: Math.max(0, this.data.palletCount - 1)
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -298,7 +295,7 @@ Page({
           this.setData({
             pickupPrice: res.cost.toString()
           }, () => {
-            this.calculateNetProfit();
+            this.calculateSuggestPrice();
           });
         }
       }
@@ -314,7 +311,7 @@ Page({
           this.setData({
             deliveryPrice: res.cost.toString()
           }, () => {
-            this.calculateNetProfit();
+            this.calculateSuggestPrice();
           });
         }
       }
@@ -340,7 +337,7 @@ Page({
           deliveryPrice: deliveryCost.toString()
         });
       }
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   },
 
@@ -349,7 +346,7 @@ Page({
     this.setData({
       palletCount: event.detail
     }, () => {
-      this.calculateNetProfit();
+      this.calculateSuggestPrice();
     });
   }
 }); 

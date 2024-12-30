@@ -24,6 +24,12 @@
 
     <!-- 底部价格栏 -->
     <view class="bottom-bar">
+      <!-- 建议报价 -->
+      <view class="suggest-price">
+        <text class="label">建议最低报价</text>
+        <text class="value">¥{{suggestPrice}}</text>
+      </view>
+
       <!-- 吨位 -->
       <view class="price-item">
         <text class="price-label">吨位</text>
@@ -35,19 +41,6 @@
           input-width="220rpx"
           button-size="56rpx"
           bind:change="onWeightChange"
-        />
-      </view>
-      
-      <!-- 打托数 -->
-      <view class="price-item">
-        <text class="price-label">打托数</text>
-        <van-stepper
-          value="{{palletCount}}"
-          integer
-          min="0"
-          input-width="220rpx"
-          button-size="56rpx"
-          bind:change="onPalletCountChange"
         />
       </view>
 
@@ -79,37 +72,13 @@
         />
       </view>
 
-      <!-- 总报价 -->
-      <view class="price-item">
-        <text class="price-label">总报价</text>
-        <van-stepper
-          value="{{totalQuote}}"
-          integer
-          step="100"
-          min="0"
-          input-width="220rpx"
-          button-size="56rpx"
-          bind:change="onTotalQuoteChange"
-        />
-      </view>
-
-      <!-- 预估净得 -->
-      <view class="bottom-row">
-        <view class="net-profit">
-          <text class="label">预估净得</text>
-          <text class="value">¥{{netProfit}}</text>
-        </view>
+      <view class="button-row">
         <van-button 
           custom-class="reupload-btn" 
           type="info" 
           plain 
           bind:click="onBack"
         >再次使用估价</van-button>
-      </view>
-
-      <!-- 计算过程 -->
-      <view class="calculation">
-        <text class="detail">计算过程：{{totalQuote}}-{{pickupPrice}}-{{transitPrice}}×{{weight}}-{{deliveryPrice}}-{{palletCount}}×30</text>
       </view>
     </view>
   </block>
