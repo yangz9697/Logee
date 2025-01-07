@@ -1,4 +1,4 @@
-const COZE_TOKEN = 'pat_lZ2zkZyuZuJjZiPm928zskjhRP22UKOtQtSRZPQhpW0fNH8i6mM7O4eSf0QplUnO';
+const COZE_TOKEN = 'pat_hgjTQ5PZGBUHPl8sJ67mbxSe0w6sasuIPocfaG3xknMQxShTHnofB2DOKUphYXti';
 
 const cozeService = {
   async parseText(text) {
