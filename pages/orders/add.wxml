@@ -1,0 +1,177 @@
+<view class="container">
+  <!-- 基本信息 -->
+  <view class="card">
+    <van-cell-group>
+      <!-- 站点选择区域 -->
+      <view class="station-section">
+        <view class="station-group">
+          <view class="station-label">始发站点</view>
+          <view class="destination-grid">
+            <view
+              wx:for="{{stations}}"
+              wx:key="id"
+              class="grid-item {{pickupStationId === item.id ? 'active' : ''}}"
+              bindtap="onStartPointChange"
+              data-station="{{item}}"
+            >
+              <text class="city-name">{{item.city}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="station-group">
+          <view class="station-label">到达站点</view>
+          <view class="destination-grid">
+            <view
+              wx:for="{{availableDestinations}}"
+              wx:key="id"
+              class="grid-item {{deliveryStationId === item.id ? 'active' : ''}}"
+              bindtap="onEndPointChange"
+              data-station="{{item}}"
+            >
+              <text class="city-name">{{item.city}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <van-field label="提货地区" model:value="{{pickupArea}}" placeholder="请输入提货地区（如：苏州相城）" input-align="right" />
+      <van-field label="送货地区" model:value="{{deliveryArea}}" placeholder="请输入送货地区（如：广州番禺）" input-align="right" />
+      <van-field
+        label="货物名称"
+        model:value="{{cargo.name}}"
+        placeholder="请输入货物名称"
+        input-align="right"
+        bind:change="onCargoInput"
+        data-field="name"
+      />
+      <van-cell title="货物信息">
+        <view class="specs-input">
+          <van-field
+            model:value="{{cargo.weight}}"
+            type="digit"
+            placeholder="重量/吨"
+            border="{{false}}"
+            custom-style="padding: 0; text-align: right;"
+            input-align="right"
+            bind:change="onCargoInput"
+            data-field="weight"
+          >
+          </van-field>
+          <text class="separator">｜</text>
+          <van-field
+            model:value="{{cargo.volume}}"
+            type="digit"
+            placeholder="体积/方"
+            border="{{false}}"
+            custom-style="padding: 0; text-align: right;"
+            input-align="right"
+            bind:change="onCargoInput"
+            data-field="volume"
+          >
+          </van-field>
+        </view>
+      </van-cell>
+      <van-field 
+        label="托盘信息" 
+        model:value="{{cargo.pallets}}" 
+        placeholder="4托 0.2*1.1*1.8" 
+        input-align="right"
+        bind:change="onCargoInput"
+        data-field="pallets"
+      />
+    </van-cell-group>
+  </view>
+
+  <!-- 费用和回单信息 -->
+  <view class="card">
+    <van-cell-group>
+      <van-cell title="费用信息">
+        <view class="specs-input">
+          <van-field
+            model:value="{{fees.tech}}"
+            type="number"
+            placeholder="技术费"
+            border="{{false}}"
+            custom-style="padding: 0; text-align: right;"
+            input-align="right"
+            bind:change="onFeesInput"
+            data-field="tech"
+          >
+            <!-- <text slot="right-icon" style="margin-left: 4rpx">元</text> -->
+          </van-field>
+          <text class="separator">/</text>
+          <van-field
+            model:value="{{fees.total}}"
+            type="number"
+            placeholder="总费用"
+            border="{{false}}"
+            custom-style="padding: 0; text-align: right;"
+            input-align="right"
+            bind:change="onFeesInput"
+            data-field="total"
+          >
+            <!-- <text slot="right-icon" style="margin-left: 4rpx">元</text> -->
+          </van-field>
+        </view>
+      </van-cell>
+      <van-cell title="付款方式">
+        <van-radio-group value="{{paymentMethod}}" bind:change="onPaymentMethodChange" direction="horizontal">
+          <view class="radio-group">
+            <van-radio name="return">{{enums.paymentMethod.return}}</van-radio>
+            <van-radio name="arrival">{{enums.paymentMethod.arrival}}</van-radio>
+          </view>
+        </van-radio-group>
+      </van-cell>
+      <van-cell title="需要回单">
+        <van-switch size="16px" checked="{{cargo.receipt.required}}" bind:change="onToggleReceipt" />
+      </van-cell>
+      <block wx:if="{{cargo.receipt.required}}">
+        <van-cell title="回单类型">
+          <van-radio-group value="{{cargo.receipt.type}}" bind:change="onSelectReceiptType">
+            <view class="radio-group">
+              <van-radio name="electronic">{{enums.receiptType.electronic}}</van-radio>
+              <van-radio name="paper">{{enums.receiptType.paper}}</van-radio>
+            </view>
+          </van-radio-group>
+        </van-cell>
+        <van-cell title="回传方式">
+          <van-radio-group value="{{cargo.receipt.returnMethod}}" bind:change="onSelectReturnMethod">
+            <view class="radio-group">
+              <van-radio name="photo">{{enums.returnMethod.photo}}</van-radio>
+              <van-radio name="mail">{{enums.returnMethod.mail}}</van-radio>
+            </view>
+          </van-radio-group>
+        </van-cell>
+      </block>
+    </van-cell-group>
+  </view>
+
+  <view class="footer">
+    <view class="submit-btn" bindtap="onSubmit">提交订单</view>
+  </view>
+</view>
+
+<!-- 站点选择弹窗 -->
+<van-popup
+  show="{{showStationPopup}}"
+  position="bottom"
+  round
+  bind:close="onStationPopupClose"
+>
+  <view class="station-picker">
+    <view class="station-picker-header">
+      <text class="station-picker-title">选择{{selectingType === 'pickup' ? '提货' : '送货'}}站点</text>
+      <van-icon name="cross" bindtap="onStationPopupClose" />
+    </view>
+    <view class="station-list">
+      <view 
+        class="station-item"
+        wx:for="{{selectingType === 'pickup' ? stations : availableDestinations}}"
+        wx:key="id"
+        bindtap="onStationSelect"
+        data-station="{{item}}"
+      >
+        <view class="station-name">{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+</van-popup> 

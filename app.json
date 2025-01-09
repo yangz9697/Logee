@@ -1,5 +1,8 @@
 {
 	"pages": [
+		"pages/orders/index",
+		"pages/orders/detail",
+		"pages/orders/add",
 		"pages/estimate/index",
 		"pages/estimate/detail",
 		"pages/estimate/map",
@@ -20,12 +23,14 @@
 		"van-dialog": "@vant/weapp/dialog/index",
 		"van-overlay": "@vant/weapp/overlay/index",
 		"van-picker": "@vant/weapp/picker/index",
-		"van-popup": "@vant/weapp/popup/index"
+		"van-popup": "@vant/weapp/popup/index",
+		"van-switch": "@vant/weapp/switch/index"
 	},
 	"window": {
 		"backgroundTextStyle": "dark",
 		"navigationBarTextStyle": "white",
-		"navigationBarBackgroundColor": "#007AFF"
+		"navigationBarBackgroundColor": "#007AFF",
+		"enablePullDownRefresh": true
 	},
 	"subpackages": [],
 	"preloadRule": {},
@@ -42,6 +47,10 @@
 		"backgroundColor": "#ffffff",
 		"borderStyle": "black",
 		"list": [
+			{
+				"pagePath": "pages/orders/index",
+				"text": "订单"
+			},
 			{
 				"pagePath": "pages/estimate/index",
 				"text": "估价"

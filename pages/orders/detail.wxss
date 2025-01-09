@@ -1,0 +1,304 @@
+.container {
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding: 24rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  color: #323233;
+  font-weight: 500;
+}
+
+.basic-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.location-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+  gap: 16rpx;
+}
+
+.route {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  padding-right: 8rpx;
+}
+
+.city {
+  font-size: 30rpx;
+  color: #323233;
+  font-weight: 500;
+}
+
+.station {
+  font-size: 26rpx;
+  color: #969799;
+}
+
+.arrow {
+  margin: 0 8rpx;
+  color: #007AFF;
+  font-weight: bold;
+}
+
+.divider {
+  height: 2rpx;
+  background: #f5f7fa;
+  margin: 12rpx 0;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #969799;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.value {
+  font-size: 28rpx;
+  color: #323233;
+  text-align: right;
+}
+
+.value.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.value-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.phone {
+  color: #007AFF;
+  font-size: 28rpx;
+}
+
+.copy-btn {
+  font-size: 24rpx;
+  color: #969799;
+  padding: 4rpx 12rpx;
+  background: #f7f8fa;
+  border-radius: 4rpx;
+}
+
+.shipping-info .info-item {
+  margin-bottom: 12rpx;
+}
+
+.shipping-info .info-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 货物信息样式 */
+.cargo-info .info-item {
+  margin-bottom: 12rpx;
+}
+
+.cargo-info .info-item:last-child {
+  margin-bottom: 0;
+}
+
+.pallet-size {
+  font-size: 26rpx;
+  color: #969799;
+  margin-left: 8rpx;
+}
+
+.separator {
+  color: #969799;
+  margin: 0;
+}
+
+/* 其他信息样式 */
+.other-info .info-item {
+  margin-bottom: 12rpx;
+}
+
+.other-info .info-item:last-child {
+  margin-bottom: 0;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding-top: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.action-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 28rpx;
+  color: #646566;
+  background: #fff;
+  border: 2rpx solid #ebedf0;
+  padding: 12rpx 32rpx;
+  border-radius: 8rpx;
+}
+
+.price {
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.footer-action {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.footer-btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #ffffff;
+  background: #007AFF;
+  border-radius: 8rpx;
+}
+
+.value.status {
+  color: #007AFF;
+}
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 26rpx;
+  color: #969799;
+  flex-shrink: 0;
+}
+
+.edit-btn .van-icon {
+  font-size: 28rpx;
+}
+
+/* 费用编辑弹窗样式 */
+.fee-editor {
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}
+
+.fee-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.fee-editor-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #323233;
+}
+
+.fee-editor-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.fee-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fee-label {
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.fee-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #f5f7fa;
+}
+
+.fee-value {
+  font-size: 32rpx;
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.fee-editor-footer {
+  margin-top: 32rpx;
+}
+
+/* 单选框样式 */
+.radio-cell {
+  padding-right: 32rpx !important;
+}
+
+.radio-group {
+  display: flex;
+  gap: 32rpx;
+  justify-content: flex-end;
+}
+
+.van-radio__label {
+  margin-left: 8rpx !important;
+}
+
+.value {
+  color: #323233;
+}
+
+.value.placeholder {
+  color: #969799;
+  font-size: 28rpx;
+}
+ 

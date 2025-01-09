@@ -1,0 +1,190 @@
+.container {
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding: 0 0 24rpx 0;
+}
+
+.tabs {
+  display: flex;
+  background: #ffffff;
+  padding: 0 32rpx;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tab-item {
+  position: relative;
+  padding: 28rpx 24rpx;
+  font-size: 28rpx;
+  color: #646566;
+  flex: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.tab-item.active {
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background: #007AFF;
+  border-radius: 2rpx;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 24rpx;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.route {
+  font-size: 32rpx;
+  color: #323233;
+  font-weight: 500;
+}
+
+.status {
+  font-size: 28rpx;
+  color: #007AFF;
+}
+
+.order-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.cargo-info {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+}
+
+.cargo-name {
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.weight {
+  font-size: 26rpx;
+  color: #646566;
+}
+
+.driver-info {
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.driver-name {
+  font-size: 28rpx;
+  color: #646566;
+}
+
+.station-tags {
+  display: flex;
+  gap: 16rpx;
+}
+
+.station-tag {
+  font-size: 26rpx;
+  color: #646566;
+  background: #f7f8fa;
+  padding: 4rpx 16rpx;
+  border-radius: 4rpx;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16rpx;
+}
+
+.driver-info {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.driver-label {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.driver-name {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.safe-bottom {
+  height: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.footer-action {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  padding: 24rpx 32rpx;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.footer-btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #ffffff;
+  background: #007AFF;
+  border-radius: 8rpx;
+}
+
+.order-date {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.tab-count {
+  font-size: 24rpx;
+  color: #969799;
+  background: #f7f8fa;
+  padding: 2rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.tab-item.active .tab-count {
+  color: #007AFF;
+  background: #e8f3ff;
+} 

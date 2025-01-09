@@ -1,0 +1,446 @@
+<view class="container">
+  <view class="card basic-info">
+    <view class="card-header">
+      <text class="card-title">基本信息</text>
+      <view class="edit-btn" bindtap="onEditBasic">
+        <van-icon name="edit" />
+        <text>编辑</text>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="location-info">
+      <view class="route">
+        <text class="city">{{order.pickupArea}}</text>
+        <text class="station">({{order.pickupSiteName}})</text>
+        <text class="arrow">→</text>
+        <text class="city">{{order.deliveryArea}}</text>
+        <text class="station">({{order.deliverySiteName}})</text>
+      </view>
+    </view>
+    <view class="info-list">
+      <view class="info-item">
+        <text class="label">运输状态</text>
+        <text class="value status">{{order.statusName}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">付款方式</text>
+        <text class="value">{{order.paymentMethod === 'return' ? '回付' : '到付'}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">运单号</text>
+        <view class="value-wrapper">
+          <text class="value {{!order.waybillNo ? 'placeholder' : ''}}">{{order.waybillNo || '待补充'}}</text>
+          <text class="copy-btn" bindtap="copyOrderId" wx:if="{{order.waybillNo}}">复制</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="label">到仓日期</text>
+        <text class="value {{!order.arrivalTime ? 'placeholder' : ''}}">{{order.arrivalTimeText}}</text>
+      </view>
+      <block wx:if="{{order.remark}}">
+        <view class="info-item">
+          <text class="label">备注</text>
+          <text class="value {{!order.remark ? 'placeholder' : ''}}">{{order.remark || '待补充'}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card cargo-info">
+    <view class="card-header">
+      <text class="card-title">货物信息</text>
+      <view class="edit-btn" bindtap="onEditCargo">
+        <van-icon name="edit" />
+        <text>编辑</text>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="info-item">
+      <text class="label">货物信息</text>
+      <view class="value-wrapper">
+        <text class="value">{{order.cargo.name}}</text>
+        <text class="separator">|</text>
+        <text class="value">{{order.cargo.weight}}吨</text>
+        <text class="separator">|</text>
+        <text class="value">{{order.cargo.volume}}方</text>
+      </view>
+    </view>
+    <view class="info-item">
+      <text class="label">包装</text>
+      <text class="value">{{order.cargo.pallets}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">回单信息</text>
+      <view class="value-wrapper">
+        <text class="value">{{order.cargo.receipt.required ? '需要' : '不需要'}}</text>
+        <block wx:if="{{order.cargo.receipt.required}}">
+          <text class="separator">|</text>
+          <text class="value">{{receiptTypeEnum[order.cargo.receipt.type]}}</text>
+          <text class="separator">|</text>
+          <text class="value">{{returnMethodEnum[order.cargo.receipt.returnMethod]}}</text>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <view class="card shipping-info">
+    <view class="card-header">
+      <text class="card-title">联系信息</text>
+      <view class="edit-btn" bindtap="onEditShipping">
+        <van-icon name="edit" />
+        <text>编辑</text>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="info-item">
+      <text class="label">发货人</text>
+      <view class="value-wrapper">
+        <text class="value">{{order.shipper.contact}}</text>
+        <text class="phone" bindtap="makeCall" data-phone="{{order.shipper.phone}}">{{order.shipper.phone}}</text>
+        <text class="copy-btn" bindtap="copyPhone" data-phone="{{order.shipper.phone}}" wx:if="{{order.shipper.phone}}">复制</text>
+      </view>
+    </view>
+    <view class="info-item">
+      <text class="label">发货地址</text>
+      <view class="value-wrapper">
+        <text class="value ellipsis">{{order.shipper.address}}</text>
+        <text class="copy-btn" bindtap="copyAddress" data-address="{{order.shipper.address}}" wx:if="{{order.shipper.address}}">复制</text>
+      </view>
+    </view>
+    <view class="info-item">
+      <text class="label">收货人</text>
+      <view class="value-wrapper">
+        <text class="value">{{order.receiver.contact}}</text>
+        <text class="phone" bindtap="makeCall" data-phone="{{order.receiver.phone}}">{{order.receiver.phone}}</text>
+        <text class="copy-btn" bindtap="copyPhone" data-phone="{{order.receiver.phone}}" wx:if="{{order.receiver.phone}}">复制</text>
+      </view>
+    </view>
+    <view class="info-item">
+      <text class="label">收货地址</text>
+      <view class="value-wrapper">
+        <text class="value ellipsis">{{order.receiver.address}}</text>
+        <text class="copy-btn" bindtap="copyAddress" data-address="{{order.receiver.address}}" wx:if="{{order.receiver.address}}">复制</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card other-info">
+    <view class="card-header">
+      <text class="card-title">订单信息</text>
+      <view class="edit-btn" bindtap="showFeeEditor">
+        <van-icon name="edit" />
+        <text>编辑</text>
+      </view>
+    </view>
+    <view class="divider"></view>
+    <view class="info-item">
+      <text class="label">接单信息</text>
+      <view class="value-wrapper">
+        <text class="value {{!order.agentName ? 'placeholder' : ''}}">{{order.agentName || '接单员'}}</text>
+        <text class="separator">|</text>
+        <text class="value">{{order.createTimeText}}</text>
+      </view>
+    </view>
+    <view class="info-item">
+      <text class="label">费用信息</text>
+      <view class="value-wrapper">
+        <text class="value">提¥{{order.fees.pickup}}</text>
+        <text class="separator">|</text>
+        <text class="value">送¥{{order.fees.delivery}}</text>
+        <text class="separator">|</text>
+        <text class="value">技¥{{order.fees.tech}}</text>
+        <text class="separator">|</text>
+        <text class="value price">总¥{{order.fees.total}}</text>
+      </view>
+    </view>
+  </view>
+
+  <van-popup
+    show="{{showFeePopup}}"
+    position="bottom"
+    round
+    bind:close="onFeePopupClose"
+  >
+    <view class="fee-editor">
+      <view class="fee-editor-header">
+        <text class="fee-editor-title">编辑费用</text>
+        <van-icon name="cross" bindtap="onFeePopupClose" />
+      </view>
+      <view class="fee-editor-content">
+        <view class="fee-item">
+          <text class="fee-label">提货费用</text>
+          <van-stepper
+            value="{{editingFees.pickup}}"
+            integer
+            step="10"
+            min="0"
+            input-width="160rpx"
+            data-type="pickup"
+            bind:change="onFeeChange"
+          />
+        </view>
+        <view class="fee-item">
+          <text class="fee-label">送货费用</text>
+          <van-stepper
+            value="{{editingFees.delivery}}"
+            integer
+            step="10"
+            min="0"
+            input-width="160rpx"
+            data-type="delivery"
+            bind:change="onFeeChange"
+          />
+        </view>
+        <view class="fee-item">
+          <text class="fee-label">技术信息费</text>
+          <van-stepper
+            value="{{editingFees.tech}}"
+            integer
+            step="10"
+            min="0"
+            input-width="160rpx"
+            data-type="tech"
+            bind:change="onFeeChange"
+          />
+        </view>
+        <view class="fee-total">
+          <text class="fee-label">总费用</text>
+          <van-stepper
+            value="{{editingFees.total}}"
+            integer
+            step="100"
+            min="0"
+            input-width="160rpx"
+            data-type="total"
+            bind:change="onFeeChange"
+          />
+        </view>
+      </view>
+      <view class="fee-editor-footer">
+        <van-button block type="info" bind:click="saveFees">保存</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 联系信息编辑弹窗 -->
+  <van-popup
+    show="{{showShippingPopup}}"
+    position="bottom"
+    round
+    bind:close="onShippingPopupClose"
+  >
+    <view class="fee-editor">
+      <view class="fee-editor-header">
+        <text class="fee-editor-title">编辑联系信息</text>
+        <van-icon name="cross" bindtap="onShippingPopupClose" />
+      </view>
+      <view class="fee-editor-content">
+        <van-cell-group title="发货方">
+          <van-field
+            label="联系人"
+            value="{{editingShipping.shipper.contact}}"
+            bind:change="onShipperContactChange"
+            placeholder="请输入联系人"
+            input-align="right"
+          />
+          <van-field
+            label="联系电话"
+            type="number"
+            value="{{editingShipping.shipper.phone}}"
+            bind:change="onShipperPhoneChange"
+            placeholder="请输入联系电话"
+            input-align="right"
+          />
+          <van-field
+            label="详细地址"
+            type="textarea"
+            autosize
+            value="{{editingShipping.shipper.address}}"
+            bind:change="onShipperAddressChange"
+            placeholder="请输入详细地址"
+            input-align="right"
+          />
+        </van-cell-group>
+        <van-cell-group title="收货方">
+          <van-field
+            label="联系人"
+            value="{{editingShipping.receiver.contact}}"
+            bind:change="onReceiverContactChange"
+            placeholder="请输入联系人"
+            input-align="right"
+          />
+          <van-field
+            label="联系电话"
+            type="number"
+            value="{{editingShipping.receiver.phone}}"
+            bind:change="onReceiverPhoneChange"
+            placeholder="请输入联系电话"
+            input-align="right"
+          />
+          <van-field
+            label="详细地址"
+            type="textarea"
+            autosize
+            value="{{editingShipping.receiver.address}}"
+            bind:change="onReceiverAddressChange"
+            placeholder="请输入详细地址"
+            input-align="right"
+          />
+        </van-cell-group>
+      </view>
+      <view class="fee-editor-footer">
+        <van-button block type="info" bind:click="saveShipping">保存</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 货物信息编辑弹窗 -->
+  <van-popup
+    show="{{showCargoPopup}}"
+    position="bottom"
+    round
+    bind:close="onCargoPopupClose"
+  >
+    <view class="fee-editor">
+      <view class="fee-editor-header">
+        <text class="fee-editor-title">编辑货物信息</text>
+        <van-icon name="cross" bindtap="onCargoPopupClose" />
+      </view>
+      <view class="fee-editor-content">
+        <van-cell-group>
+          <van-field
+            label="货物名称"
+            value="{{editingCargo.name}}"
+            bind:change="onCargoNameChange"
+            placeholder="请输入货物名称"
+            input-align="right"
+          />
+          <van-field
+            label="重量(吨)"
+            type="digit"
+            value="{{editingCargo.weight}}"
+            bind:change="onCargoWeightChange"
+            placeholder="请输入重量"
+            input-align="right"
+          />
+          <van-field
+            label="体积(方)"
+            type="digit"
+            value="{{editingCargo.volume}}"
+            bind:change="onCargoVolumeChange"
+            placeholder="请输入体积"
+            input-align="right"
+          />
+          <van-field
+            label="托盘信息"
+            value="{{editingCargo.pallets}}"
+            bind:change="onCargoPalletsChange"
+            placeholder="请输入托盘尺寸"
+            input-align="right"
+          />
+          <van-cell title="需要回单">
+            <van-switch checked="{{editingCargo.receipt.required}}" bind:change="onReceiptChange" size="16px" />
+          </van-cell>
+          <block wx:if="{{editingCargo.receipt.required}}">
+            <van-cell title="回单类型" custom-class="radio-cell">
+              <van-radio-group value="{{editingCargo.receipt.type}}" bind:change="onReceiptTypeChange">
+                <view class="radio-group">
+                  <van-radio name="electronic">电子</van-radio>
+                  <van-radio name="paper">纸质</van-radio>
+                </view>
+              </van-radio-group>
+            </van-cell>
+            <van-cell title="回传方式" custom-class="radio-cell">
+              <van-radio-group value="{{editingCargo.receipt.returnMethod}}" bind:change="onReturnMethodChange">
+                <view class="radio-group">
+                  <van-radio name="photo">拍照</van-radio>
+                  <van-radio name="mail">邮寄</van-radio>
+                </view>
+              </van-radio-group>
+            </van-cell>
+          </block>
+        </van-cell-group>
+      </view>
+      <view class="fee-editor-footer">
+        <van-button block type="info" bind:click="saveCargo">保存</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 基本信息编辑弹窗 -->
+  <van-popup
+    show="{{showBasicPopup}}"
+    position="bottom"
+    custom-style="min-height: 40%"
+    bind:close="onBasicPopupClose"
+  >
+    <view class="fee-editor">
+      <view class="fee-editor-header">
+        <text class="fee-editor-title">编辑基本信息</text>
+      </view>
+      <view class="fee-editor-content">
+        <van-radio-group value="{{editingBasic.paymentMethod}}" bind:change="onPaymentMethodChange">
+          <van-cell title="付款方式" custom-class="radio-cell">
+            <view class="radio-group">
+              <van-radio name="return">回付</van-radio>
+              <van-radio name="arrival">到付</van-radio>
+            </view>
+          </van-cell>
+        </van-radio-group>
+        <van-field
+          label="运单号"
+          value="{{editingBasic.waybillNo}}"
+          bind:change="onWaybillNoChange"
+          placeholder="请输入运单号"
+          input-align="right"
+        />
+        <van-cell title="到仓日期" is-link bindtap="showDatePicker">
+          <view style="text-align: right">{{editingBasic.arrivalTime || '请选择到仓日期'}}</view>
+        </van-cell>
+        <van-field
+          label="备注"
+          value="{{editingBasic.remark}}"
+          bind:change="onRemarkChange"
+          placeholder="请输入备注信息"
+          type="textarea"
+          autosize
+          input-align="right"
+        />
+      </view>
+      <view class="fee-editor-footer">
+        <van-button block type="info" bind:click="saveBasic">保存</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 日期选择器 -->
+  <van-popup
+    show="{{showDatePicker}}"
+    position="bottom"
+    bind:close="onDatePickerClose"
+  >
+    <van-datetime-picker
+      type="date"
+      value="{{currentDate}}"
+      bind:confirm="onDateConfirm"
+      bind:cancel="onDatePickerClose"
+      min-date="{{minDate}}"
+    />
+  </van-popup>
+
+  <view class="safe-bottom"></view>
+
+  <view class="footer-action">
+    <view class="action-buttons">
+      <view class="action-btn" bindtap="goToPickupDoc">
+        提货单
+      </view>
+      <view class="action-btn" bindtap="goToDeliveryDoc">
+        送货单
+      </view>
+    </view>
+    <view class="footer-btn" bindtap="onOrderFlow">
+      订单流转
+    </view>
+  </view>
+</view>
