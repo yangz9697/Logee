@@ -1,4 +1,5 @@
 import { formatTimestamp } from '../../utils/date';
+import { getOrders, getOrderStatistics } from '../../services/orders';
 
 Page({
   data: {
@@ -9,7 +10,7 @@ Page({
       { name: '全部', value: 'all' }
     ],
     isRefreshing: false,
-    hasDriverPermission: false,
+    isAdmin: false,
     orders: [],
     orderCounts: {
       processing: 0,
@@ -44,33 +45,19 @@ Page({
   // 加载订单数据
   async loadOrders(status) {
     try {
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `http://49.234.42.166:3000/api/orders?status=${status}`,
-          method: 'GET',
-          header: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '获取订单列表失败'));
-            }
-          },
-          fail: reject
-        });
-      });
-
-      // 更新订单列表
+      this.setData({ isLoading: true });
+      const res = await getOrders({ status });
+      console.log('加载订单数据:', res);
+      
+      // 处理订单数据，添加格式化的时间
+      const orders = res.map(order => ({
+        ...order,
+        createTimeText: this.getCreateTime(order.createTime)
+      }));
+      
       this.setData({
-        orders: res.items.map(order => ({
-          ...order,
-          pickupSiteName: order.pickupSiteName,  // 字段名适配
-          deliverySiteName: order.deliverySiteName,  // 字段名适配
-          createTime: order.createTime,  // 确保使用createTime作为接单日期
-          createTimeText: this.getCreateTime(order.createTime)  // 预先格式化时间
-        }))
+        orders: orders,
+        isLoading: false
       });
     } catch (error) {
       console.error('加载订单失败:', error);
@@ -90,31 +77,27 @@ Page({
   },
 
   onLoad() {
+    // 从本地存储获取用户信息，判断是否是管理员
+    const userInfo = wx.getStorageSync('userInfo');
+    this.setData({
+      isAdmin: userInfo.roleName === '管理员'
+    });
+
     // 初始加载进行中的订单
     this.loadOrders('processing');
-    this.checkPermission();
     this.loadOrderCounts();
   },
 
   onShow() {
     // 每次显示页面时刷新当前 tab 的数据
     const status = this.data.tabs[this.data.activeTab].value;
-    this.loadOrders(status);
-  },
-
-  // 检查权限
-  async checkPermission() {
-    try {
-      // TODO: 调用权限检查接口
-      // const res = await permissionService.checkPermission('viewDriver');
-      // this.setData({ hasDriverPermission: res.hasPermission });
-      
-      // 临时模拟权限检查
-      this.setData({ hasDriverPermission: false });
-    } catch (error) {
-      console.error('权限检查失败:', error);
-      this.setData({ hasDriverPermission: false });
-    }
+    // 同时刷新订单列表和订单数量
+    Promise.all([
+      this.loadOrders(status),
+      this.loadOrderCounts()
+    ]).catch(error => {
+      console.error('刷新数据失败:', error);
+    });
   },
 
   onOrderClick(e) {
@@ -141,23 +124,7 @@ Page({
   // 加载订单数量统计
   async loadOrderCounts() {
     try {
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: 'http://49.234.42.166:3000/api/orders/statistics/count',
-          method: 'GET',
-          header: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '获取订单数量统计失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await getOrderStatistics();
       
       this.setData({ orderCounts: res });
     } catch (error) {

@@ -3,11 +3,15 @@
 		"pages/orders/index",
 		"pages/orders/detail",
 		"pages/orders/add",
+		"pages/orders/track",
+		"pages/dispatch/index",
 		"pages/estimate/index",
 		"pages/estimate/detail",
 		"pages/estimate/map",
 		"pages/analysis/index",
-		"pages/profile/index"
+		"pages/profile/index",
+		"pages/login/index",
+		"pages/register/index"
 	],
 	"usingComponents": {
 		"van-button": "@vant/weapp/button/index",
@@ -42,27 +46,41 @@
 		}
 	},
 	"tabBar": {
-		"color": "#999999",
-		"selectedColor": "#007AFF",
+		"color": "#cdcdcd",
+		"selectedColor": "#515151",
 		"backgroundColor": "#ffffff",
 		"borderStyle": "black",
 		"list": [
 			{
 				"pagePath": "pages/orders/index",
+				"iconPath": "assets/icons/order.png",
+				"selectedIconPath": "assets/icons/order-active.png",
 				"text": "订单"
 			},
 			{
+				"pagePath": "pages/dispatch/index",
+				"iconPath": "assets/icons/dispatch.png",
+				"selectedIconPath": "assets/icons/dispatch-active.png",
+				"text": "调度单"
+			},
+			{
 				"pagePath": "pages/estimate/index",
+				"iconPath": "assets/icons/estimate.png",
+				"selectedIconPath": "assets/icons/estimate-active.png",
 				"text": "估价"
 			},
 			{
 				"pagePath": "pages/analysis/index",
+				"iconPath": "assets/icons/warehouse.png",
+				"selectedIconPath": "assets/icons/warehouse-active.png",
 				"text": "线路分析"
 			},
 			{
 				"pagePath": "pages/profile/index",
+				"iconPath": "assets/icons/profile.png",
+				"selectedIconPath": "assets/icons/profile-active.png",
 				"text": "我的"
 			}
 		]
-	}
+    }
 }

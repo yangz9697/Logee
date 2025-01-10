@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="waybill-info">
+    <text class="label">运单号</text>
+    <text class="value">{{waybillNo}}</text>
+  </view>
+
+  <van-loading wx:if="{{loading}}" custom-class="loading" />
+  
+  <view class="timeline" wx:else>
+    <view class="timeline-item" wx:for="{{tracks}}" wx:key="operateTime">
+      <view class="time">{{item.timeText}}</view>
+      <view class="content">{{item.content}}</view>
+    </view>
+  </view>
+</view> 

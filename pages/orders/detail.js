@@ -1,7 +1,16 @@
 import { formatTimestamp, parseDateTime } from '../../utils/date';
+import {
+  getOrderDetail,
+  updateOrderBasic,
+  updateOrderCargo,
+  updateOrderShipping,
+  updateOrderFees,
+  updateOrderStatus
+} from '../../services/orders';
 
 Page({
   data: {
+    isAdmin: false,  // 是否是管理员
     order: {
       id: '',    // 订单号
       waybillNo: '',  // 运单号
@@ -26,7 +35,8 @@ Page({
         tech: 0,
         total: 0
       },
-      createTime: ''
+      createTime: '',
+      nextAction: null  // 下一步操作信息
     },
     // 回单类型枚举
     receiptTypeEnum: {
@@ -57,7 +67,7 @@ Page({
       showBasicPopup: true,
       editingBasic: {
         paymentMethod: this.data.order.paymentMethod,
-        waybillNo: this.data.order.waybillNo || '',
+        waybillNo: this.data.isAdmin ? (this.data.order.waybillNo || '') : '',
         arrivalTime: this.data.order.arrivalTime ? formatTimestamp(this.data.order.arrivalTime, 'YYYY-MM-DD') : '',
         remark: this.data.order.remark || ''
       }
@@ -85,25 +95,7 @@ Page({
       };
       
       // 调用更新接口
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `http://49.234.42.166:3000/api/orders/${this.data.order.id}/basic`,
-          method: 'PATCH',
-          header: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          data: basicData,
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '更新基本信息失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await updateOrderBasic(this.data.order.id, basicData);
 
       // 关闭弹窗
       this.setData({ showBasicPopup: false });
@@ -112,7 +104,7 @@ Page({
       await this.loadOrderDetail(this.data.order.id);
       
       wx.showToast({
-        title: res.message || '保存成功',
+        title: '保存成功',
         icon: 'success'
       });
     } catch (error) {
@@ -143,19 +135,19 @@ Page({
 
   onEditShipping() {
     this.setData({
-      showShippingPopup: true,
       editingShipping: {
         shipper: {
-          contact: this.data.order.shipper.contact || '',
-          phone: this.data.order.shipper.phone || '',
-          address: this.data.order.shipper.address || ''
+          contact: this.data.order.shipper?.contact || '',
+          phone: this.data.order.shipper?.phone || '',
+          address: this.data.order.shipper?.address || ''
         },
         receiver: {
-          contact: this.data.order.receiver.contact || '',
-          phone: this.data.order.receiver.phone || '',
-          address: this.data.order.receiver.address || ''
+          contact: this.data.order.receiver?.contact || '',
+          phone: this.data.order.receiver?.phone || '',
+          address: this.data.order.receiver?.address || ''
         }
-      }
+      },
+      showShippingPopup: true
     });
   },
 
@@ -234,29 +226,21 @@ Page({
   },
 
   async onLoad(options) {
-    const { id } = options;
-    await this.loadOrderDetail(id);
+    // 从本地存储获取用户信息，判断是否是管理员
+    const userInfo = wx.getStorageSync('userInfo');
+    this.setData({
+      isAdmin: userInfo.roleName === '管理员'
+    });
+
+    if (options.id) {
+      this.loadOrderDetail(options.id);
+    }
   },
 
-  async loadOrderDetail(id) {
+  async loadOrderDetail(orderId) {
     try {
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `http://49.234.42.166:3000/api/orders/${id}`,
-          method: 'GET',
-          header: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '获取订单详情失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await getOrderDetail(orderId);
+      console.log('加载订单详情:', res);
 
       // 处理费用单位转换（从分转为元）
       const fees = {
@@ -322,25 +306,7 @@ Page({
       };
       
       // 调用更新接口
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `http://49.234.42.166:3000/api/orders/${this.data.order.id}/fees`,
-          method: 'PATCH',
-          header: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          data: feesData,
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '更新费用信息失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await updateOrderFees(this.data.order.id, feesData);
 
       // 关闭弹窗
       this.setData({ showFeePopup: false });
@@ -349,7 +315,7 @@ Page({
       await this.loadOrderDetail(this.data.order.id);
       
       wx.showToast({
-        title: res.message || '保存成功',
+        title: '保存成功',
         icon: 'success'
       });
     } catch (error) {
@@ -382,25 +348,7 @@ Page({
       };
       
       // 调用更新接口
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `http://49.234.42.166:3000/api/orders/${this.data.order.id}/shipping`,
-          method: 'PATCH',
-          header: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          data: shippingData,
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '更新联系信息失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await updateOrderShipping(this.data.order.id, shippingData);
 
       // 关闭弹窗
       this.setData({ showShippingPopup: false });
@@ -409,7 +357,7 @@ Page({
       await this.loadOrderDetail(this.data.order.id);
       
       wx.showToast({
-        title: res.message || '保存成功',
+        title: '保存成功',
         icon: 'success'
       });
     } catch (error) {
@@ -459,25 +407,7 @@ Page({
       };
       
       // 调用更新接口
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `http://49.234.42.166:3000/api/orders/${this.data.order.id}/cargo`,
-          method: 'PATCH',
-          header: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          data: cargoData,
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '更新货物信息失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await updateOrderCargo(this.data.order.id, cargoData);
 
       // 关闭弹窗
       this.setData({ showCargoPopup: false });
@@ -486,7 +416,7 @@ Page({
       await this.loadOrderDetail(this.data.order.id);
       
       wx.showToast({
-        title: res.message || '保存成功',
+        title: '保存成功',
         icon: 'success'
       });
     } catch (error) {
@@ -620,6 +550,50 @@ Page({
   onReceiverAddressChange(e) {
     this.setData({
       'editingShipping.receiver.address': e.detail
+    });
+  },
+
+  // 处理订单状态流转
+  async onOrderStatusChange() {
+    if (!this.data.order.nextAction) return;
+
+    try {
+      wx.showLoading({ title: '处理中...' });
+      
+      await updateOrderStatus(this.data.order.id, {
+        status: this.data.order.nextAction.nextStatus
+      });
+
+      // 刷新订单详情
+      await this.loadOrderDetail(this.data.order.id);
+
+      wx.showToast({
+        title: '操作成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('更新订单状态失败:', error);
+      wx.showToast({
+        title: error.message || '操作失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
+  goToTrack() {
+    if (!this.data.order?.waybillNo) {
+      wx.showToast({
+        title: '运单号不能为空',
+        icon: 'none'
+      });
+      return;
+    }
+
+    console.log('跳转轨迹页面, 运单号:', this.data.order.waybillNo);
+    wx.navigateTo({
+      url: `/pages/orders/track?waybillNo=${this.data.order.waybillNo}`
     });
   },
 }); 

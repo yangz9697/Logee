@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="login-box">
+    <view class="title">登录</view>
+    <van-cell-group>
+      <van-field
+        value="{{username}}"
+        label="用户名"
+        placeholder="请输入用户名"
+        bind:change="onUsernameChange"
+      />
+      <van-field
+        value="{{password}}"
+        label="密码"
+        type="password"
+        placeholder="请输入密码"
+        bind:change="onPasswordChange"
+      />
+    </van-cell-group>
+    <view class="btn-group">
+      <van-button block type="info" bindtap="onLogin">登录</van-button>
+    </view>
+  </view>
+  <view class="register-link" catchtap="onRegister">
+    <text>还没有账号？</text>
+    <text class="link">立即注册</text>
+  </view>
+</view> 

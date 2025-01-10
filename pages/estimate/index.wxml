@@ -147,7 +147,7 @@
       block 
       disabled="{{!canProceed}}"
       loading="{{isLoading}}"
-      bind:click="onNextStep"
+      bindtap="onNextStep"
       custom-class="next-btn"
     >开始估价</van-button>
   </view>

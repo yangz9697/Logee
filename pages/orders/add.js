@@ -1,5 +1,7 @@
 import { origins } from '../../utils/stations';
-import { getEnums } from '../../utils/enums';
+import { getEnums } from '../../services/enums';
+import { createOrder } from '../../services/orders';
+import { getSiteDestinations } from '../../services/sites';
 
 Page({
   data: {
@@ -47,30 +49,15 @@ Page({
   // 加载站点数据
   async loadStations() {
     try {
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: 'http://49.234.42.166:3000/api/site-destinations',
-          method: 'GET',
-          header: {
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          success: (res) => {
-            if (res.statusCode === 200) {
-              resolve(res.data);
-            } else {
-              reject(new Error(`Request failed with status ${res.statusCode}`));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await getSiteDestinations();
+      const sites = res;
 
-      if (Array.isArray(res)) {
+      if (Array.isArray(sites)) {
         // 设置站点数据并默认选中第一个站点
-        const firstStation = res[0];
+        const firstStation = sites[0];
         const firstDestination = firstStation.destinations[0];
         this.setData({
-          stations: res,
+          stations: sites,
           pickupStationId: firstStation.id,
           pickupSiteName: firstStation.name,
           availableDestinations: firstStation.destinations,
@@ -155,12 +142,11 @@ Page({
   // 提交订单
   async onSubmit() {
     try {
-      // 表单验证
+      // 验证必填字段
       if (!this.validateForm()) {
         return;
       }
 
-      // 构造请求数据
       const orderData = {
         pickupArea: this.data.pickupArea,
         deliveryArea: this.data.deliveryArea,
@@ -168,8 +154,8 @@ Page({
         deliverySite: this.data.deliveryStationId,
         paymentMethod: this.data.paymentMethod,
         fees: {
-          tech: Number(this.data.fees.tech) * 100, // 转换为分
-          total: Number(this.data.fees.total) * 100
+          tech: this.data.fees.tech,
+          total: this.data.fees.total,
         },
         cargo: {
           name: this.data.cargo.name,
@@ -180,47 +166,17 @@ Page({
         }
       };
 
-      const res = await new Promise((resolve, reject) => {
-        wx.request({
-          url: 'http://49.234.42.166:3000/api/orders',
-          method: 'POST',
-          header: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-          },
-          data: orderData,
-          success: (res) => {
-            if (res.data && res.data.success) {
-              resolve(res.data);
-            } else {
-              reject(new Error(res.data.message || '创建订单失败'));
-            }
-          },
-          fail: reject
-        });
-      });
+      const res = await createOrder(orderData);
 
-      // 返回列表页并刷新
-      const pages = getCurrentPages();
-      const ordersPage = pages[pages.length - 2];  // 获取订单列表页面
-      if (ordersPage) {
-        // 刷新订单列表和订单数量
-        ordersPage.loadOrders('processing');
-        ordersPage.loadOrderCounts();
-      }
-
-      // 先显示成功提示
       wx.showToast({
-        title: res.message || '创建成功',
-        icon: 'success',
-        duration: 1500,
-        success: () => {
-          // 提示显示后再返回
-          setTimeout(() => {
-            wx.navigateBack();
-          }, 1000);
-        }
+        title: '创建成功',
+        icon: 'success'
       });
+
+      // 返回上一页
+      setTimeout(() => {
+        wx.navigateBack();
+      }, 1500);
 
     } catch (error) {
       console.error('创建订单失败:', error);

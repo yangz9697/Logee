@@ -4,6 +4,7 @@ const cozeService = require('../../services/coze');
 const amapService = require('../../services/amap');
 const roleService = require('../../services/role');
 import Toast from '@vant/weapp/toast/toast';
+import { createEstimate } from '../../services/estimate';
 
 Page({
   data: {
@@ -165,53 +166,19 @@ Page({
 
   // 下一步
   async onNextStep() {
-    if (!this.data.ocrSuccess) return;
-
     try {
-      wx.showLoading({ title: '正在分析数据...' });
-
-      // 使用现有的 callWorkflow 方法分析文本
-      console.log('开始分析文本:', this.data.ocrText);
-      const response = await cozeService.callWorkflow(this.data.ocrText);
-      const result = await cozeService.handleResponse(response);
-
-      // 搜索装卸货地址的高德地图位置
-      let loadingLocation = null;
-      let unloadingLocation = null;
+      this.setData({ isLoading: true });
       
-      try {
-        // 搜索装货地址
-        const loadingResults = await amapService.searchPOI(result.loadingPlace);
-        if (loadingResults && loadingResults.length > 0) {
-          loadingLocation = loadingResults[0];
-        }
-        
-        // 搜索卸货地址
-        const unloadingResults = await amapService.searchPOI(result.unloadingPlace);
-        if (unloadingResults && unloadingResults.length > 0) {
-          unloadingLocation = unloadingResults[0];
-        }
-      } catch (error) {
-        console.error('地址搜索失败:', error);
-      }
+      const estimateData = {
+        origin: this.data.currentLines[this.data.startPointIndex],
+        destination: this.data.destinations[this.data.endPointIndex]
+      };
 
-      // 如果有任一地址未找到,显示手动选择界面
-      if (!loadingLocation || !unloadingLocation) {
-        this.setData({
-          tempImagePath: '',
-          loadingAddress: result.loadingPlace,
-          unloadingAddress: result.unloadingPlace,
-          showAddressSelection: true,
-          analysisResult: result
-        });
-        wx.hideLoading();
-        Toast('请确认装卸货地址');
-        return;
-      }
+      const res = await createEstimate(estimateData);
 
-      // 如果都找到了地址,直接跳转详情页
-      this.navigateToDetail(loadingLocation, unloadingLocation, result);
-
+      wx.navigateTo({
+        url: `/pages/estimate/detail?id=${res.id}`
+      });
     } catch (error) {
       console.error('数据分析失败:', error);
       wx.showToast({

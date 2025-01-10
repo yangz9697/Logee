@@ -1,7 +1,28 @@
 <!--pages/profile/index.wxml-->
 <view class="container">
-  <van-cell-group>
-    <van-cell title="我的" size="large" />
-    <van-cell title="功能开发中" label="敬请期待" />
-  </van-cell-group>
+  <!-- 用户信息区域 -->
+  <view class="user-info">
+    <view class="avatar">
+      <van-icon name="manager" size="60px" color="#1989fa" />
+    </view>
+    <view class="info">
+      <view class="username">{{userInfo.username || '未登录'}}</view>
+      <view class="role">{{userInfo.roleName || ''}}</view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="function-list">
+    <!-- 可以添加其他功能按钮 -->
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-section">
+    <van-button 
+      type="danger" 
+      block 
+      custom-class="logout-btn"
+      bind:click="onLogout"
+    >退出登录</van-button>
+  </view>
 </view>

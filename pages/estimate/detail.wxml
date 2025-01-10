@@ -77,7 +77,7 @@
           custom-class="reupload-btn" 
           type="info" 
           plain 
-          bind:click="onBack"
+          bindtap="onBack"
         >再次使用估价</van-button>
       </view>
     </view>

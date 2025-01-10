@@ -38,7 +38,7 @@
         </view>
         <view class="order-footer">
           <view class="order-date">建单日期：{{item.createTimeText}}</view>
-          <view class="driver-info" wx:if="{{hasDriverPermission}}">
+          <view class="driver-info" wx:if="{{isAdmin}}">
             <text class="driver-label">接单员：</text>
             <text class="driver-name">{{item.agentName}}</text>
           </view>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "运单轨迹",
+  "usingComponents": {
+    "van-loading": "@vant/weapp/loading/index"
+  }
+} 

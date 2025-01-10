@@ -1,0 +1,6 @@
+<view class="container">
+  <van-cell-group>
+    <van-cell title="调度单" size="large" />
+    <van-cell title="功能开发中" label="敬请期待" />
+  </van-cell-group>
+</view> 

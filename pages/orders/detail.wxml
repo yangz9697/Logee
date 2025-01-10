@@ -26,13 +26,15 @@
         <text class="label">付款方式</text>
         <text class="value">{{order.paymentMethod === 'return' ? '回付' : '到付'}}</text>
       </view>
-      <view class="info-item">
-        <text class="label">运单号</text>
-        <view class="value-wrapper">
-          <text class="value {{!order.waybillNo ? 'placeholder' : ''}}">{{order.waybillNo || '待补充'}}</text>
-          <text class="copy-btn" bindtap="copyOrderId" wx:if="{{order.waybillNo}}">复制</text>
+      <block wx:if="{{isAdmin}}">
+        <view class="info-item">
+          <text class="label">运单号</text>
+          <view class="value-wrapper">
+            <text class="value {{!order.waybillNo ? 'placeholder' : ''}}">{{order.waybillNo || '待补充'}}</text>
+            <text class="copy-btn" bindtap="copyOrderId" wx:if="{{order.waybillNo}}">复制</text>
+          </view>
         </view>
-      </view>
+      </block>
       <view class="info-item">
         <text class="label">到仓日期</text>
         <text class="value {{!order.arrivalTime ? 'placeholder' : ''}}">{{order.arrivalTimeText}}</text>
@@ -217,7 +219,7 @@
         </view>
       </view>
       <view class="fee-editor-footer">
-        <van-button block type="info" bind:click="saveFees">保存</van-button>
+        <van-button block type="info" bindtap="saveFees">保存</van-button>
       </view>
     </view>
   </van-popup>
@@ -289,7 +291,7 @@
         </van-cell-group>
       </view>
       <view class="fee-editor-footer">
-        <van-button block type="info" bind:click="saveShipping">保存</van-button>
+        <van-button block type="info" bindtap="saveShipping">保存</van-button>
       </view>
     </view>
   </van-popup>
@@ -362,7 +364,7 @@
         </van-cell-group>
       </view>
       <view class="fee-editor-footer">
-        <van-button block type="info" bind:click="saveCargo">保存</van-button>
+        <van-button block type="info" bindtap="saveCargo">保存</van-button>
       </view>
     </view>
   </van-popup>
@@ -371,44 +373,43 @@
   <van-popup
     show="{{showBasicPopup}}"
     position="bottom"
-    custom-style="min-height: 40%"
+    custom-style="height: 60%"
     bind:close="onBasicPopupClose"
   >
-    <view class="fee-editor">
-      <view class="fee-editor-header">
-        <text class="fee-editor-title">编辑基本信息</text>
+    <view class="popup-container">
+      <view class="popup-header">
+        <text>编辑基本信息</text>
+        <van-icon name="cross" bindtap="onBasicPopupClose" />
       </view>
-      <view class="fee-editor-content">
-        <van-radio-group value="{{editingBasic.paymentMethod}}" bind:change="onPaymentMethodChange">
-          <van-cell title="付款方式" custom-class="radio-cell">
+      <view class="popup-content">
+        <block wx:if="{{isAdmin}}">
+          <van-field
+            label="运单号"
+            value="{{ editingBasic.waybillNo }}"
+            placeholder="请输入运单号"
+            bind:change="onWaybillNoChange"
+          />
+        </block>
+        <van-cell title="付款方式" custom-class="radio-cell">
+          <van-radio-group value="{{editingBasic.paymentMethod}}" bind:change="onPaymentMethodChange">
             <view class="radio-group">
               <van-radio name="return">回付</van-radio>
               <van-radio name="arrival">到付</van-radio>
             </view>
-          </van-cell>
-        </van-radio-group>
-        <van-field
-          label="运单号"
-          value="{{editingBasic.waybillNo}}"
-          bind:change="onWaybillNoChange"
-          placeholder="请输入运单号"
-          input-align="right"
-        />
-        <van-cell title="到仓日期" is-link bindtap="showDatePicker">
-          <view style="text-align: right">{{editingBasic.arrivalTime || '请选择到仓日期'}}</view>
+          </van-radio-group>
         </van-cell>
+        <van-cell title="到仓日期" is-link value="{{editingBasic.arrivalTime || '请选择'}}" bind:click="showDatePicker" />
         <van-field
           label="备注"
           value="{{editingBasic.remark}}"
-          bind:change="onRemarkChange"
           placeholder="请输入备注信息"
           type="textarea"
           autosize
-          input-align="right"
+          bind:change="onRemarkChange"
         />
       </view>
-      <view class="fee-editor-footer">
-        <van-button block type="info" bind:click="saveBasic">保存</van-button>
+      <view class="popup-footer">
+        <van-button block type="info" bindtap="saveBasic">保存</van-button>
       </view>
     </view>
   </van-popup>
@@ -431,16 +432,17 @@
   <view class="safe-bottom"></view>
 
   <view class="footer-action">
-    <view class="action-buttons">
-      <view class="action-btn" bindtap="goToPickupDoc">
-        提货单
+    <block wx:if="{{order.waybillNo}}">
+      <view class="action-buttons">
+        <view class="action-btn" bindtap="goToTrack">
+          轨迹查询
+        </view>
       </view>
-      <view class="action-btn" bindtap="goToDeliveryDoc">
-        送货单
+    </block>
+    <block wx:if="{{order.nextAction}}">
+      <view class="footer-btn" bindtap="onOrderStatusChange">
+        {{order.nextAction.text}}
       </view>
-    </view>
-    <view class="footer-btn" bindtap="onOrderFlow">
-      订单流转
-    </view>
+    </block>
   </view>
 </view>

@@ -301,4 +301,34 @@
   color: #969799;
   font-size: 28rpx;
 }
+
+.popup-container {
+  padding: 20px;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.popup-content {
+  margin-bottom: 20px;
+}
+
+.popup-footer {
+  padding: 0 16px;
+}
+
+.radio-cell {
+  padding: 10px 16px !important;
+}
+
+.radio-group {
+  display: flex;
+  gap: 20px;
+}
  

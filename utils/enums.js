@@ -1,26 +1,12 @@
+import { getEnums as fetchEnums } from '../services/enums';
+
 // 加载枚举数据
-export const loadEnums = async () => {
+export const loadEnums = async (type) => {
   try {
-    const res = await new Promise((resolve, reject) => {
-      wx.request({
-        url: 'http://49.234.42.166:3000/api/enums',
-        method: 'GET',
-        header: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdhN2QxNDM5NmMwNjI5N2ZiMjA4ZDMiLCJyb2xlSWQiOiI2NzYyYzE1YjZiMjI4ZjMzMmQxMjAyMzEiLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MDg2OTk3LCJleHAiOjE3Mzg2Nzg5OTd9.P4l_5Fj20k-DyR1fbQiuiWi8LGNnz6x4Duwi7qmVGmw'
-        },
-        success: (res) => {
-          if (res.statusCode === 200) {
-            resolve(res.data);
-          } else {
-            reject(new Error(`Request failed with status ${res.statusCode}`));
-          }
-        },
-        fail: reject
-      });
-    });
-    return res;
+    const res = await fetchEnums(type);
+    return res.data;
   } catch (error) {
-    console.error('加载枚举数据失败:', error);
+    console.error('获取枚举数据失败:', error);
     return null;
   }
 };
@@ -29,9 +15,26 @@ export const loadEnums = async () => {
 let enumsCache = null;
 
 // 获取枚举数据
-export const getEnums = async () => {
+export const getCachedEnums = async () => {
   if (!enumsCache) {
     enumsCache = await loadEnums();
   }
   return enumsCache;
+};
+
+export const getEnums = () => {
+  return Promise.resolve({
+    paymentMethod: {
+      return: '回付',
+      arrival: '到付'
+    },
+    receiptType: {
+      electronic: '电子',
+      paper: '纸质'
+    },
+    returnMethod: {
+      photo: '拍照',
+      mail: '邮寄'
+    }
+  });
 }; 

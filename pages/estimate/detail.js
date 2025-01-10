@@ -1,5 +1,6 @@
 const amapService = require('../../services/amap');
 const { MOCK_RESPONSE, USE_MOCK } = require('../../constants/index');
+const { getEstimateDetail } = require('../../services/estimate');
 
 Page({
   data: {
@@ -348,5 +349,19 @@ Page({
     }, () => {
       this.calculateSuggestPrice();
     });
+  },
+
+  async loadEstimateDetail(id) {
+    try {
+      this.setData({ isLoading: true });
+      const res = await getEstimateDetail(id);
+
+      this.setData({
+        isLoading: false,
+        ...res
+      });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 }); 
