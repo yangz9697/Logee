@@ -1,6 +1,45 @@
 <view class="container">
-  <van-cell-group>
-    <van-cell title="调度单" size="large" />
-    <van-cell title="功能开发中" label="敬请期待" />
-  </van-cell-group>
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === index ? 'active' : ''}}" 
+      wx:for="{{tabs}}" 
+      wx:key="value"
+      bindtap="onTabChange"
+      data-index="{{index}}"
+    >
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+
+  <block wx:if="{{dispatchList.length > 0}}">
+    <view class="dispatch-list">
+      <view 
+        class="dispatch-card" 
+        wx:for="{{dispatchList}}" 
+        wx:key="id"
+        bindtap="onDispatchClick"
+        data-type="{{item.type}}"
+        data-id="{{item.id}}"
+      >
+        <view class="dispatch-header">
+          <view class="cargo-info">
+            <text class="cargo-name">{{item.cargoName}}</text>
+            <text class="weight">{{item.weight}}吨 {{item.volume}}方</text>
+          </view>
+          <view class="status">{{item.statusName}}</view>
+        </view>
+        <view class="dispatch-content">
+          <view class="area-info">
+            <text class="area">{{item.startArea}} → {{item.endArea}}</text>
+            <text class="type-tag">{{item.type === 'pickup' ? '提货' : '送货'}}</text>
+          </view>
+        </view>
+        <view class="dispatch-footer">
+          <text class="create-time">{{item.createTimeText}}</text>
+          <text class="assignee" wx:if="{{item.assigneeName}}">{{item.assigneeName}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+  <van-empty wx:else description="暂无调度单" />
 </view> 

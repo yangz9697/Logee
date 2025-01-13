@@ -5,6 +5,7 @@
 		"pages/orders/add",
 		"pages/orders/track",
 		"pages/dispatch/index",
+		"pages/dispatch/detail",
 		"pages/estimate/index",
 		"pages/estimate/detail",
 		"pages/estimate/map",
@@ -28,7 +29,9 @@
 		"van-overlay": "@vant/weapp/overlay/index",
 		"van-picker": "@vant/weapp/picker/index",
 		"van-popup": "@vant/weapp/popup/index",
-		"van-switch": "@vant/weapp/switch/index"
+		"van-switch": "@vant/weapp/switch/index",
+		"van-swipe-cell": "@vant/weapp/swipe-cell/index",
+		"van-datetime-picker": "@vant/weapp/datetime-picker/index"
 	},
 	"window": {
 		"backgroundTextStyle": "dark",

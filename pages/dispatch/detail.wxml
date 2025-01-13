@@ -1,0 +1,253 @@
+<view class="container">
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">基本信息</text>
+      <view class="header-tags">
+        <text class="type-tag {{dispatch.typeName === '提货' ? 'pickup' : 'delivery'}}">{{dispatch.typeName}}</text>
+        <text class="status-tag">{{dispatch.statusName}}</text>
+      </view>
+    </view>
+    <view class="info-list">
+      <view class="info-item">
+        <text class="label">调度单号</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.id}}</text>
+          <text class="copy-btn" bindtap="copyText" data-text="{{dispatch.id}}">复制</text>
+        </view>
+      </view>
+      <block wx:if="{{dispatch.type === 'delivery'}}">
+        <view class="info-item">
+          <text class="label">运单号</text>
+          <view class="value-wrapper">
+            <text class="value {{!dispatch.waybillNo ? 'placeholder' : ''}}">{{dispatch.waybillNo || '待补充'}}</text>
+            <text class="copy-btn" bindtap="copyText" data-text="{{dispatch.waybillNo}}" wx:if="{{dispatch.waybillNo}}">复制</text>
+          </view>
+        </view>
+      </block>
+      <view class="info-item">
+        <text class="label">货物名称</text>
+        <text class="value">{{dispatch.order.cargo.name}} {{dispatch.order.cargo.weight}}吨 {{dispatch.order.cargo.volume}}方</text>
+      </view>
+      <view class="info-item">
+        <text class="label">托盘信息</text>
+        <text class="value">{{dispatch.order.cargo.pallets}}</text>
+      </view>
+      <block wx:if="{{dispatch.type === 'delivery'}}">
+        <view class="info-item">
+          <text class="label">提货车辆</text>
+          <text class="value">{{dispatch.pickupDispatch.vehicle.length}}米/{{dispatch.pickupDispatch.vehicle.width}}米/{{dispatch.pickupDispatch.vehicle.typeName}}</text>
+        </view>
+      </block>
+      <block wx:if="{{dispatch.receipt.required}}">
+        <view class="info-item">
+          <text class="label">回单要求</text>
+          <text class="value">{{dispatch.receipt.type === 'paper' ? '纸质回单' : '电子回单'}}/{{dispatch.receipt.returnMethod === 'photo' ? '拍照回传' : '邮寄'}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-header">
+      <text class="card-title">联系信息</text>
+    </view>
+    <view class="info-list">
+      <view class="info-item">
+        <text class="label">提货地址</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.from.location}}</text>
+          <text class="copy-btn" bindtap="copyText" data-text="{{dispatch.from.location}}">复制</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="label">提货联系人</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.from.name}}</text>
+          <text class="call-btn" bindtap="makeCall" data-phone="{{dispatch.from.phone}}">拨打</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="label">提货电话</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.from.phone}}</text>
+          <text class="call-btn" bindtap="makeCall" data-phone="{{dispatch.from.phone}}">拨打</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="label">送货地址</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.to.location}}</text>
+          <text class="copy-btn" bindtap="copyText" data-text="{{dispatch.to.location}}">复制</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="label">送货联系人</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.to.name}}</text>
+          <text class="call-btn" bindtap="makeCall" data-phone="{{dispatch.to.phone}}">拨打</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <text class="label">送货电话</text>
+        <view class="value-wrapper">
+          <text class="value">{{dispatch.to.phone}}</text>
+          <text class="call-btn" bindtap="makeCall" data-phone="{{dispatch.to.phone}}">拨打</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 送达信息 -->
+  <block wx:if="{{dispatch.transportInfo}}">
+    <view class="card">
+      <view class="card-header">
+        <text class="card-title">送达信息</text>
+        <view class="edit-btn" bindtap="onEditDelivery">
+          <van-icon name="edit" />
+          <text>编辑</text>
+        </view>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="label">运输距离</text>
+          <text class="value">{{dispatch.transportInfo.distance}}公里</text>
+        </view>
+        <view class="info-item">
+          <text class="label">运输价格</text>
+          <text class="value">¥{{dispatch.transportInfo.price}}</text>
+        </view>
+        <view class="info-item">
+          <text class="label">送达车辆</text>
+          <text class="value">{{dispatch.transportInfo.vehicle.length}}米/{{dispatch.transportInfo.vehicle.width}}米/{{dispatch.transportInfo.vehicle.typeName}}</text>
+        </view>
+        <view class="info-item">
+          <text class="label">货单</text>
+          <text class="value">{{dispatch.transportInfo.hasReceipt ? '有货单' : '无货单'}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="footer-action">
+    <block wx:if="{{!dispatch.nextAction}}">
+      <view class="footer-buttons">
+        <view class="footer-btn outline" bindtap="goToOrder">查看订单</view>
+        <block wx:if="{{dispatch.type === 'delivery'}}">
+          <view class="footer-btn outline" bindtap="goToPickupDispatch">查看提货单</view>
+        </block>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="footer-btn" bindtap="onStatusChange">{{dispatch.nextAction.text}}</view>
+    </block>
+  </view>
+
+  <!-- 送达信息录入弹窗 -->
+  <van-popup
+    show="{{showDeliveryPopup}}"
+    position="bottom"
+    round
+    bind:close="onDeliveryPopupClose"
+  >
+    <view class="popup-container">
+      <view class="popup-header">
+        <text class="popup-title">开始运输</text>
+        <van-icon name="cross" bindtap="onDeliveryPopupClose" />
+      </view>
+      <view class="popup-content">
+        <van-cell-group>
+          <van-field
+            label="司机姓名"
+            value="{{ deliveryForm.driverName }}"
+            placeholder="请输入司机姓名"
+            bind:change="onDriverNameChange"
+          />
+          <van-field
+            label="司机电话"
+            value="{{ deliveryForm.driverPhone }}"
+            type="number"
+            maxlength="11"
+            placeholder="请输入司机电话"
+            bind:change="onDriverPhoneChange"
+          />
+          <van-field
+            label="车牌号"
+            value="{{ deliveryForm.vehicle.plateNumber }}"
+            placeholder="请输入车牌号"
+            bind:change="onVehiclePlateNumberChange"
+          />
+          <van-field
+            label="车长"
+            type="digit"
+            value="{{deliveryForm.vehicle.length}}"
+            placeholder="请输入车长"
+            right-icon="米"
+            bind:change="onVehicleLengthChange"
+          />
+          <van-field
+            label="车宽"
+            type="digit"
+            value="{{deliveryForm.vehicle.width}}"
+            placeholder="请输入车宽"
+            right-icon="米"
+            bind:change="onVehicleWidthChange"
+          />
+          <van-cell title="车型">
+            <van-radio-group value="{{deliveryForm.vehicle.type}}" bind:change="onVehicleTypeChange">
+              <view class="radio-group">
+                <van-radio wx:for="{{vehicleTypes}}" wx:key="value" name="{{item.value}}">{{item.name}}</van-radio>
+              </view>
+            </van-radio-group>
+          </van-cell>
+          <van-field
+            label="运输距离"
+            type="digit"
+            value="{{deliveryForm.distance}}"
+            placeholder="请输入运输距离"
+            right-icon="kilometer"
+            bind:change="onDeliveryDistanceChange"
+          />
+        </van-cell-group>
+      </view>
+      <view class="popup-footer">
+        <van-button block type="info" bindtap="saveDelivery">确认开始运输</van-button>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 完成运输弹窗 -->
+  <van-popup
+    show="{{showCompletePopup}}"
+    position="bottom"
+    round
+    bind:close="onCompletePopupClose"
+  >
+    <view class="popup-container">
+      <view class="popup-header">
+        <text class="popup-title">完成运输</text>
+        <van-icon name="cross" bindtap="onCompletePopupClose" />
+      </view>
+      <view class="popup-content">
+        <van-cell-group>
+          <van-field
+            label="运输价格"
+            type="digit"
+            value="{{completeForm.price}}"
+            placeholder="请输入运输价格"
+            right-icon="yuan"
+            bind:change="onCompletePriceChange"
+          />
+          <van-cell title="是否有回单">
+            <van-switch
+              checked="{{completeForm.hasReceipt}}"
+              bind:change="onHasReceiptChange"
+            />
+          </van-cell>
+        </van-cell-group>
+      </view>
+      <view class="popup-footer">
+        <van-button block type="info" bindtap="saveComplete">确认完成运输</van-button>
+      </view>
+    </view>
+  </van-popup>
+</view> 

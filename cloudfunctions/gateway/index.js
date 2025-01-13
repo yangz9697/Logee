@@ -5,7 +5,7 @@ const request = require('request-promise')
 cloud.init()
 
 // 基础配置
-const BASE_URL = 'http://49.234.42.166:3000/api'
+const BASE_URL = 'http://49.234.42.166:3001/api'
 
 // 云函数入口函数
 exports.main = async (event, context) => {

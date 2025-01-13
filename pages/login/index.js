@@ -33,7 +33,8 @@ Page({
       wx.setStorageSync('token', res.token);
       wx.setStorageSync('userInfo', {
         username: res.user.username,
-        roleName: res.user.role?.displayName || ''
+        roleName: res.user.role?.displayName || '',
+        phone: res.user.phone
       });
 
       wx.showToast({

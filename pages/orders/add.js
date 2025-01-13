@@ -2,6 +2,7 @@ import { origins } from '../../utils/stations';
 import { getEnums } from '../../services/enums';
 import { createOrder } from '../../services/orders';
 import { getSiteDestinations } from '../../services/sites';
+import { formatTimestamp } from '../../utils/date';
 
 Page({
   data: {
@@ -13,7 +14,15 @@ Page({
     pickupStationId: '',
     deliveryStationId: '',
     availableDestinations: [],  // 可选的送货站点
-    paymentMethod: 'return',  // 默认回付
+    shipper: {
+      contact: '',
+      phone: '',
+      address: ''
+    },
+    arrivalTime: formatTimestamp(new Date().getTime(), 'YYYY-MM-DD'),  // 默认当天
+    showDatePicker: false,
+    currentDate: new Date().getTime(),
+    minDate: new Date().getTime(),
 
     // 货物信息
     cargo: {
@@ -21,29 +30,25 @@ Page({
       weight: '',
       volume: '',
       pallets: '',
-      receipt: {
-        required: true,  // 默认需要回单
-        type: 'paper',   // 默认纸质回单
-        returnMethod: 'photo'  // 默认拍照回传
-      }
     },
 
-    // 费用信息
-    fees: {
-      tech: '',
-      total: ''
-    },
-
-    showStationPopup: false,
-    selectingType: '',  // pickup/delivery
     stations: [],      // 所有提货站点
-    enums: null,  // 枚举数据
+
+    // 回单信息
+    receipt: {
+      required: false,
+      type: '',    // 从枚举获取默认值
+      returnMethod: ''  // 从枚举获取默认值
+    },
+    paymentMethod: '',  // 从枚举获取默认值
+    receiptTypes: [],
+    returnMethods: [],
+    paymentMethods: []
   },
 
   async onLoad() {
     this.loadStations();
-    const enums = await getEnums();
-    this.setData({ enums });
+    await this.loadEnums();
   },
 
   // 加载站点数据
@@ -92,81 +97,37 @@ Page({
     });
   },
 
-  // 付款方式变更
-  onPaymentMethodChange(e) {
-    this.setData({
-      paymentMethod: e.detail
-    });
-  },
-
-  // 切换回单要求
-  onToggleReceipt(e) {
-    this.setData({
-      'cargo.receipt.required': e.detail
-    });
-  },
-
-  // 选择回单类型
-  onSelectReceiptType(e) {
-    this.setData({
-      'cargo.receipt.type': e.detail
-    });
-  },
-
-  // 选择回传方式
-  onSelectReturnMethod(e) {
-    this.setData({
-      'cargo.receipt.returnMethod': e.detail
-    });
-  },
-
-  // 计算总费用
-  calculateTotal() {
-    const { tech } = this.data.fees;
-    const total = Number(tech || 0);
-    this.setData({
-      'fees.total': total
-    });
-  },
-
-  // 费用信息输入处理
-  onFeesInput(e) {
+  // 发货人信息输入处理
+  onShipperInput(e) {
     const { field } = e.currentTarget.dataset;
-    // 确保输入的是整数
-    const value = parseInt(e.detail) || '';
     this.setData({
-      [`fees.${field}`]: value
+      [`shipper.${field}`]: e.detail
     });
   },
 
   // 提交订单
   async onSubmit() {
     try {
-      // 验证必填字段
-      if (!this.validateForm()) {
-        return;
-      }
+      if (!this.validateForm()) return;
 
-      const orderData = {
+      wx.showLoading({ title: '提交中...' });
+
+      // 构建请求数据
+      const data = {
         pickupArea: this.data.pickupArea,
         deliveryArea: this.data.deliveryArea,
-        pickupSite: this.data.pickupStationId,
-        deliverySite: this.data.deliveryStationId,
-        paymentMethod: this.data.paymentMethod,
-        fees: {
-          tech: this.data.fees.tech,
-          total: this.data.fees.total,
-        },
+        pickupStationId: this.data.pickupStationId,
+        deliveryStationId: this.data.deliveryStationId,
         cargo: {
-          name: this.data.cargo.name,
-          weight: Number(this.data.cargo.weight),
-          volume: Number(this.data.cargo.volume),
-          pallets: this.data.cargo.pallets,
-          receipt: this.data.cargo.receipt
-        }
+          ...this.data.cargo,
+          receipt: this.data.receipt
+        },
+        shipper: this.data.shipper,
+        arrivalTime: Math.floor(new Date(this.data.arrivalTime).getTime() / 1000),  // 转换为秒级时间戳
+        paymentMethod: this.data.paymentMethod
       };
 
-      const res = await createOrder(orderData);
+      const res = await createOrder(data);
 
       wx.showToast({
         title: '创建成功',
@@ -193,6 +154,10 @@ Page({
       wx.showToast({ title: '请输入提货地区', icon: 'none' });
       return false;
     }
+    if (!this.data.arrivalTime) {
+      wx.showToast({ title: '请选择到仓日期', icon: 'none' });
+      return false;
+    }
     if (!this.data.deliveryArea) {
       wx.showToast({ title: '请输入送货地区', icon: 'none' });
       return false;
@@ -217,8 +182,12 @@ Page({
       wx.showToast({ title: '请输入货物体积', icon: 'none' });
       return false;
     }
-    if (!this.data.fees.total) {
-      wx.showToast({ title: '请输入费用信息', icon: 'none' });
+    if (!this.data.shipper.phone) {
+      wx.showToast({ title: '请输入发货电话', icon: 'none' });
+      return false;
+    }
+    if (!this.data.shipper.address) {
+      wx.showToast({ title: '请输入发货地址', icon: 'none' });
       return false;
     }
     return true;
@@ -246,10 +215,75 @@ Page({
     });
   },
 
-  // 关闭站点选择弹窗
-  onStationPopupClose() {
+  // 显示日期选择器
+  showDatePicker() {
+    this.setData({ showDatePicker: true });
+  },
+
+  // 关闭日期选择器
+  onDatePickerClose() {
+    this.setData({ showDatePicker: false });
+  },
+
+  // 确认选择日期
+  onDateConfirm(e) {
     this.setData({
-      showStationPopup: false
+      arrivalTime: formatTimestamp(e.detail, 'YYYY-MM-DD'),
+      showDatePicker: false
     });
+  },
+
+  // 回单信息输入处理
+  onReceiptRequiredChange(e) {
+    this.setData({ 'receipt.required': e.detail });
+  },
+
+  // 回单类型选择处理
+  onReceiptTypeChange(e) {
+    this.setData({
+      'receipt.type': e.detail
+    });
+  },
+
+  // 回单方式选择处理
+  onReturnMethodChange(e) {
+    this.setData({
+      'receipt.returnMethod': e.detail
+    });
+  },
+
+  // 付款方式选择处理
+  onPaymentMethodChange(e) {
+    this.setData({
+      paymentMethod: e.detail
+    });
+  },
+
+  // 加载枚举数据
+  async loadEnums() {
+    try {
+      const enums = await getEnums();
+
+      // 将枚举对象转换为数组格式
+      const receiptTypes = Object.entries(enums.receiptType).map(([value, name]) => ({ value, name }));
+      const returnMethods = Object.entries(enums.returnMethod).map(([value, name]) => ({ value, name }));
+      const paymentMethods = Object.entries(enums.paymentMethod).map(([value, name]) => ({ value, name }));
+
+      // 设置枚举数据和默认值
+      this.setData({
+        receiptTypes,
+        returnMethods,
+        paymentMethods,
+        'receipt.type': receiptTypes[0]?.value || '',
+        'receipt.returnMethod': returnMethods[0]?.value || '',
+        paymentMethod: paymentMethods[0]?.value || ''
+      });
+    } catch (error) {
+      console.error('加载枚举数据失败:', error);
+      wx.showToast({
+        title: '加载枚举数据失败',
+        icon: 'none'
+      });
+    }
   },
 }); 

@@ -33,8 +33,22 @@
           </view>
         </view>
       </view>
-      <van-field label="提货地区" model:value="{{pickupArea}}" placeholder="请输入提货地区（如：苏州相城）" input-align="right" />
-      <van-field label="送货地区" model:value="{{deliveryArea}}" placeholder="请输入送货地区（如：广州番禺）" input-align="right" />
+      <van-field 
+        label="提货地区" 
+        model:value="{{pickupArea}}" 
+        placeholder="请输入提货地区（如：苏州相城）" 
+        input-align="right"
+        autosize
+        type="textarea"
+      />
+      <van-field 
+        label="送货地区" 
+        model:value="{{deliveryArea}}" 
+        placeholder="请输入送货地区（如：广州番禺）" 
+        input-align="right"
+        autosize
+        type="textarea"
+      />
       <van-field
         label="货物名称"
         model:value="{{cargo.name}}"
@@ -78,70 +92,62 @@
         bind:change="onCargoInput"
         data-field="pallets"
       />
-    </van-cell-group>
-  </view>
-
-  <!-- 费用和回单信息 -->
-  <view class="card">
-    <van-cell-group>
-      <van-cell title="费用信息">
-        <view class="specs-input">
-          <van-field
-            model:value="{{fees.tech}}"
-            type="number"
-            placeholder="技术费"
-            border="{{false}}"
-            custom-style="padding: 0; text-align: right;"
-            input-align="right"
-            bind:change="onFeesInput"
-            data-field="tech"
-          >
-            <!-- <text slot="right-icon" style="margin-left: 4rpx">元</text> -->
-          </van-field>
-          <text class="separator">/</text>
-          <van-field
-            model:value="{{fees.total}}"
-            type="number"
-            placeholder="总费用"
-            border="{{false}}"
-            custom-style="padding: 0; text-align: right;"
-            input-align="right"
-            bind:change="onFeesInput"
-            data-field="total"
-          >
-            <!-- <text slot="right-icon" style="margin-left: 4rpx">元</text> -->
-          </van-field>
-        </view>
-      </van-cell>
-      <van-cell title="付款方式">
-        <van-radio-group value="{{paymentMethod}}" bind:change="onPaymentMethodChange" direction="horizontal">
-          <view class="radio-group">
-            <van-radio name="return">{{enums.paymentMethod.return}}</van-radio>
-            <van-radio name="arrival">{{enums.paymentMethod.arrival}}</van-radio>
-          </view>
-        </van-radio-group>
-      </van-cell>
+      <van-field
+        label="发货联系人"
+        model:value="{{shipper.contact}}"
+        placeholder="选填"
+        input-align="right"
+        bind:change="onShipperInput"
+        data-field="contact"
+      />
+      <van-field
+        label="发货电话"
+        model:value="{{shipper.phone}}"
+        type="number"
+        maxlength="11"
+        placeholder="请输入联系电话"
+        input-align="right"
+        bind:change="onShipperInput"
+        data-field="phone"
+      />
+      <van-field
+        label="发货地址"
+        model:value="{{shipper.address}}"
+        placeholder="请输入详细地址"
+        input-align="right"
+        autosize
+        type="textarea"
+        bind:change="onShipperInput"
+        data-field="address"
+      />
+      <van-cell 
+        title="到仓日期" 
+        is-link 
+        value="{{arrivalTime || '请选择'}}" 
+        bind:click="showDatePicker" 
+      />
+      <!-- 回单信息 -->
       <van-cell title="需要回单">
-        <van-switch size="16px" checked="{{cargo.receipt.required}}" bind:change="onToggleReceipt" />
+        <van-switch checked="{{receipt.required}}" bind:change="onReceiptRequiredChange" />
       </van-cell>
-      <block wx:if="{{cargo.receipt.required}}">
+      <block wx:if="{{receipt.required}}">
         <van-cell title="回单类型">
-          <van-radio-group value="{{cargo.receipt.type}}" bind:change="onSelectReceiptType">
-            <view class="radio-group">
-              <van-radio name="electronic">{{enums.receiptType.electronic}}</van-radio>
-              <van-radio name="paper">{{enums.receiptType.paper}}</van-radio>
-            </view>
+          <van-radio-group value="{{receipt.type}}" bind:change="onReceiptTypeChange" direction="horizontal">
+            <van-radio wx:for="{{receiptTypes}}" wx:key="value" name="{{item.value}}">{{item.name}}</van-radio>
           </van-radio-group>
         </van-cell>
-        <van-cell title="回传方式">
-          <van-radio-group value="{{cargo.receipt.returnMethod}}" bind:change="onSelectReturnMethod">
-            <view class="radio-group">
-              <van-radio name="photo">{{enums.returnMethod.photo}}</van-radio>
-              <van-radio name="mail">{{enums.returnMethod.mail}}</van-radio>
-            </view>
+        <van-cell title="回单方式">
+          <van-radio-group value="{{receipt.returnMethod}}" bind:change="onReturnMethodChange" direction="horizontal">
+            <van-radio wx:for="{{returnMethods}}" wx:key="value" name="{{item.value}}">{{item.name}}</van-radio>
           </van-radio-group>
         </van-cell>
       </block>
+      <!-- 付款方式 -->
+      <van-cell title="付款方式">
+        <van-radio-group value="{{paymentMethod}}" bind:change="onPaymentMethodChange" direction="horizontal">
+          <van-radio wx:for="{{paymentMethods}}" wx:key="value" name="{{item.value}}">{{item.name}}</van-radio>
+        </van-radio-group>
+      </van-cell>
     </van-cell-group>
   </view>
 
@@ -150,28 +156,19 @@
   </view>
 </view>
 
-<!-- 站点选择弹窗 -->
+<!-- 日期选择器 -->
 <van-popup
-  show="{{showStationPopup}}"
+  show="{{showDatePicker}}"
   position="bottom"
   round
-  bind:close="onStationPopupClose"
+  safe-area-inset-bottom
+  bind:close="onDatePickerClose"
 >
-  <view class="station-picker">
-    <view class="station-picker-header">
-      <text class="station-picker-title">选择{{selectingType === 'pickup' ? '提货' : '送货'}}站点</text>
-      <van-icon name="cross" bindtap="onStationPopupClose" />
-    </view>
-    <view class="station-list">
-      <view 
-        class="station-item"
-        wx:for="{{selectingType === 'pickup' ? stations : availableDestinations}}"
-        wx:key="id"
-        bindtap="onStationSelect"
-        data-station="{{item}}"
-      >
-        <view class="station-name">{{item.name}}</view>
-      </view>
-    </view>
-  </view>
+  <van-datetime-picker
+    type="date"
+    value="{{currentDate}}"
+    bind:confirm="onDateConfirm"
+    bind:cancel="onDatePickerClose"
+    min-date="{{minDate}}"
+  />
 </van-popup> 

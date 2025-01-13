@@ -1,5 +1,148 @@
 .container {
   min-height: 100vh;
   background: #f7f8fa;
+  padding: 0 0 24rpx 0;
+}
+
+.tabs {
+  display: flex;
+  background: #ffffff;
+  padding: 0 32rpx;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tab-item {
+  position: relative;
+  padding: 28rpx 24rpx;
+  font-size: 28rpx;
+  color: #646566;
+  flex: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.tab-item.active {
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background: #007AFF;
+  border-radius: 2rpx;
+}
+
+.dispatch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
   padding: 24rpx;
+}
+
+.dispatch-card {
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.dispatch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.status {
+  font-size: 24rpx;
+  color: #007AFF;
+}
+
+.dispatch-content {
+  margin-bottom: 16rpx;
+}
+
+.cargo-info {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.cargo-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #323233;
+}
+
+.weight {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.area-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.area {
+  font-size: 28rpx;
+  color: #323233;
+}
+
+.type-tag {
+  font-size: 24rpx;
+  color: #ffffff;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+/* 提货标签 */
+.dispatch-card[data-type="pickup"] .type-tag {
+  background: #ff976a;
+}
+
+/* 送货标签 */
+.dispatch-card[data-type="delivery"] .type-tag {
+  background: #07c160;
+}
+
+.dispatch-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.create-time {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.assignee {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.tab-count {
+  font-size: 24rpx;
+  color: #969799;
+  background: #f7f8fa;
+  padding: 2rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.tab-item.active .tab-count {
+  color: #007AFF;
+  background: #e8f3ff;
 } 

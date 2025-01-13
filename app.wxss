@@ -450,3 +450,68 @@ button:after {
     box-sizing: border-box;
     border-radius: 0;
 }
+
+/* 全局字体大小设置 */
+page {
+    --cell-font-size: 34rpx;
+    --label-font-size: 30rpx;
+    --desc-font-size: 30rpx;
+    --small-font-size: 24rpx;
+}
+
+/* 全局字体大小调整 */
+.van-cell__title {
+    font-size: var(--cell-font-size) !important;
+}
+
+.van-cell__value {
+    font-size: var(--cell-font-size) !important;
+}
+
+.van-field__input {
+    font-size: var(--cell-font-size) !important;
+}
+
+.van-field__label {
+    font-size: var(--cell-font-size) !important;
+}
+
+.van-field__placeholder {
+    font-size: var(--label-font-size) !important;
+}
+
+.van-radio__label {
+    font-size: var(--cell-font-size) !important;
+}
+
+/* 标题和内容文字 */
+.card-title {
+    font-size: var(--cell-font-size) !important;
+}
+
+.info-item {
+    font-size: var(--cell-font-size) !important;
+}
+
+.label {
+    font-size: var(--desc-font-size) !important;
+}
+
+.value {
+    font-size: var(--desc-font-size) !important;
+}
+
+/* 按钮文字 */
+.footer-btn {
+    font-size: var(--cell-font-size) !important;
+}
+
+/* 辅助文字 */
+.desc, .time, .status {
+    font-size: var(--desc-font-size);
+}
+
+/* 小号文字 */
+.copy-btn, .call-btn {
+    font-size: var(--small-font-size) !important;
+}

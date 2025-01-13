@@ -432,6 +432,29 @@
   <view class="safe-bottom"></view>
 
   <view class="footer-action">
+    <!-- 调度单入口 -->
+    <block wx:if="{{order.pickupDispatchId || order.deliveryDispatchId}}">
+      <view class="dispatch-links">
+        <view 
+          wx:if="{{order.pickupDispatchId}}" 
+          class="dispatch-link"
+          bindtap="goToDispatch"
+          data-type="pickup"
+        >
+          提货单
+        </view>
+        <view 
+          wx:if="{{order.deliveryDispatchId}}" 
+          class="dispatch-link"
+          bindtap="goToDispatch"
+          data-type="delivery"
+        >
+          送货单
+        </view>
+      </view>
+    </block>
+    
+    <!-- 其他按钮 -->
     <block wx:if="{{order.waybillNo}}">
       <view class="action-buttons">
         <view class="action-btn" bindtap="goToTrack">
@@ -444,5 +467,14 @@
         {{order.nextAction.text}}
       </view>
     </block>
+    <view 
+      wx:for="{{order.actions}}" 
+      wx:key="type"
+      class="footer-btn {{item.primary ? 'primary' : ''}}"
+      bindtap="handleAction"
+      data-type="{{item.type}}"
+    >
+      {{item.name}}
+    </view>
   </view>
 </view>

@@ -2,18 +2,29 @@
 let isRedirecting = false;
 
 // 基础请求函数
-const request = async (options) => {
-  const token = wx.getStorageSync('token');
+const request = (options) => {
+  const { url, method = 'GET', data, params } = options;
+  // 处理 GET 请求的查询参数
+  let finalUrl = url;
+  if (params) {
+    const queryString = Object.keys(params)
+      .filter(key => params[key] !== undefined && params[key] !== '')
+      .map(key => `${key}=${encodeURIComponent(params[key])}`)
+      .join('&');
+    if (queryString) {
+      finalUrl = `${url}?${queryString}`;
+    }
+  }
 
   return new Promise((resolve, reject) => {
     wx.cloud.callFunction({
       name: 'gateway',
       data: {
-        url: options.url,
-        method: options.method || 'GET',
-        data: options.data,
+        url: finalUrl,
+        method,
+        data,
         headers: {
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          ...(wx.getStorageSync('token') ? { 'Authorization': `Bearer ${wx.getStorageSync('token')}` } : {}),
           ...options.header
         }
       },
@@ -27,7 +38,17 @@ const request = async (options) => {
           }
           isRedirecting = true;
 
-          console.log('Token过期');
+          // 判断是否在登录页面
+          const pages = getCurrentPages();
+          const currentPage = pages[pages.length - 1];
+          if (currentPage && currentPage.route === 'pages/login/index') {
+            // 在登录页面直接返回错误信息
+            reject(new Error(message || '用户名或密码错误'));
+            isRedirecting = false;
+            return;
+          }
+
+          console.log('未登录或登录已过期');
           Promise.all([
             new Promise(resolve => {
               wx.clearStorage({
@@ -39,7 +60,7 @@ const request = async (options) => {
             }),
             new Promise(resolve => {
               wx.showToast({
-                title: '登录已过期，请重新登录',
+                title: '请重新登录',
                 icon: 'none',
                 duration: 2000,
                 success: resolve

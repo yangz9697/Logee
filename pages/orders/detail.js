@@ -11,6 +11,7 @@ import {
 Page({
   data: {
     isAdmin: false,  // 是否是管理员
+    orderId: '',    // 订单ID
     order: {
       id: '',    // 订单号
       waybillNo: '',  // 运单号
@@ -20,6 +21,7 @@ Page({
       deliverySiteName: '',
       paymentMethod: '', 
       statusName: '',
+      actions: [],  // 订单可用的操作按钮
       cargo: {
         name: '',
         weight: '',
@@ -36,7 +38,7 @@ Page({
         total: 0
       },
       createTime: '',
-      nextAction: null  // 下一步操作信息
+      arrivalTimeText: '待补充'  // 只显示日期
     },
     // 回单类型枚举
     receiptTypeEnum: {
@@ -225,7 +227,7 @@ Page({
     });
   },
 
-  async onLoad(options) {
+  onLoad(options) {
     // 从本地存储获取用户信息，判断是否是管理员
     const userInfo = wx.getStorageSync('userInfo');
     this.setData({
@@ -233,13 +235,14 @@ Page({
     });
 
     if (options.id) {
-      this.loadOrderDetail(options.id);
+      this.setData({ orderId: options.id });
+      this.loadOrderDetail();
     }
   },
 
-  async loadOrderDetail(orderId) {
+  async loadOrderDetail() {
     try {
-      const res = await getOrderDetail(orderId);
+      const res = await getOrderDetail(this.data.orderId);
       console.log('加载订单详情:', res);
 
       // 处理费用单位转换（从分转为元）
@@ -255,8 +258,8 @@ Page({
         order: {
           ...res,
           fees,
-          createTimeText: this.getDateTime(res.createTime, 'YYYY-MM-DD HH:mm'),  // 预先格式化创建时间
-          arrivalTimeText: res.arrivalTime ? this.getDateTime(res.arrivalTime, 'YYYY-MM-DD') : '待补充'  // 只显示日期
+          createTimeText: this.getDateTime(res.createTime, 'YYYY-MM-DD HH:mm'),
+          arrivalTimeText: res.arrivalTime ? this.getDateTime(res.arrivalTime, 'YYYY-MM-DD') : '待补充'
         }
       });
 
@@ -594,6 +597,43 @@ Page({
     console.log('跳转轨迹页面, 运单号:', this.data.order.waybillNo);
     wx.navigateTo({
       url: `/pages/orders/track?waybillNo=${this.data.order.waybillNo}`
+    });
+  },
+
+  // 处理流转按钮点击
+  async handleAction(e) {
+    const { type } = e.currentTarget.dataset;
+    try {
+      wx.showLoading({ title: '处理中...' });
+      await updateOrderStatus(this.data.orderId, { status: type });
+      
+      wx.showToast({
+        title: '操作成功',
+        icon: 'success'
+      });
+      
+      // 重新加载订单详情
+      this.loadOrderDetail();
+    } catch (error) {
+      console.error('操作失败:', error);
+      wx.showToast({
+        title: error.message || '操作失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
+  // 跳转到调度单详情
+  goToDispatch(e) {
+    const { type } = e.currentTarget.dataset;
+    const dispatchId = type === 'pickup' ? 
+      this.data.order.pickupDispatchId : 
+      this.data.order.deliveryDispatchId;
+      
+    wx.navigateTo({
+      url: `/pages/dispatch/detail?id=${dispatchId}`
     });
   },
 }); 

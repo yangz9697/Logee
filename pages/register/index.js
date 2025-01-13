@@ -4,7 +4,8 @@ Page({
   data: {
     username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phone: ''
   },
 
   onUsernameChange(e) {
@@ -19,11 +20,23 @@ Page({
     this.setData({ confirmPassword: e.detail });
   },
 
+  onPhoneChange(e) {
+    this.setData({ phone: e.detail });
+  },
+
   async onRegister() {
     try {
-      if (!this.data.username || !this.data.password || !this.data.confirmPassword) {
+      if (!this.data.username || !this.data.password || !this.data.confirmPassword || !this.data.phone) {
         wx.showToast({
           title: '请填写完整信息',
+          icon: 'none'
+        });
+        return;
+      }
+
+      if (!/^1[3-9]\d{9}$/.test(this.data.phone)) {
+        wx.showToast({
+          title: '请输入正确的手机号',
           icon: 'none'
         });
         return;
@@ -39,14 +52,16 @@ Page({
 
       const res = await register({
         username: this.data.username,
-        password: this.data.password
+        password: this.data.password,
+        phone: this.data.phone
       });
 
       // 保存token和用户信息
       wx.setStorageSync('token', res.token);
       wx.setStorageSync('userInfo', {
         username: res.user.username,
-        roleName: res.user.role?.displayName || ''
+        roleName: res.user.role?.displayName || '',
+        phone: res.user.phone
       });
 
       wx.showToast({

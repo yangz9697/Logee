@@ -21,7 +21,7 @@
 }
 
 .card-title {
-  font-size: 30rpx;
+  font-size: var(--cell-font-size);
   color: #323233;
   font-weight: 500;
 }
@@ -49,13 +49,11 @@
 }
 
 .city {
-  font-size: 30rpx;
   color: #323233;
   font-weight: 500;
 }
 
 .station {
-  font-size: 26rpx;
   color: #969799;
 }
 
@@ -85,14 +83,12 @@
 }
 
 .label {
-  font-size: 28rpx;
   color: #969799;
   width: 140rpx;
   flex-shrink: 0;
 }
 
 .value {
-  font-size: 28rpx;
   color: #323233;
   text-align: right;
 }
@@ -114,14 +110,13 @@
 
 .phone {
   color: #007AFF;
-  font-size: 28rpx;
 }
 
 .copy-btn {
-  font-size: 24rpx;
-  color: #969799;
+  font-size: var(--small-font-size);
+  color: #007AFF;
   padding: 4rpx 12rpx;
-  background: #f7f8fa;
+  background: #e8f3ff;
   border-radius: 4rpx;
 }
 
@@ -143,7 +138,6 @@
 }
 
 .pallet-size {
-  font-size: 26rpx;
   color: #969799;
   margin-left: 8rpx;
 }
@@ -173,7 +167,6 @@
 .action-btn {
   flex: 1;
   text-align: center;
-  font-size: 28rpx;
   color: #646566;
   background: #fff;
   border: 2rpx solid #ebedf0;
@@ -200,7 +193,6 @@
   height: 72rpx;
   line-height: 72rpx;
   text-align: center;
-  font-size: 28rpx;
   color: #ffffff;
   background: #007AFF;
   border-radius: 8rpx;
@@ -208,13 +200,14 @@
 
 .value.status {
   color: #007AFF;
+  font-size: var(--cell-font-size);
+  font-weight: 500;
 }
 
 .edit-btn {
   display: flex;
   align-items: center;
   gap: 4rpx;
-  font-size: 26rpx;
   color: #969799;
   flex-shrink: 0;
 }
@@ -237,7 +230,6 @@
 }
 
 .fee-editor-title {
-  font-size: 32rpx;
   font-weight: 500;
   color: #323233;
 }
@@ -255,7 +247,6 @@
 }
 
 .fee-label {
-  font-size: 28rpx;
   color: #646566;
 }
 
@@ -269,7 +260,6 @@
 }
 
 .fee-value {
-  font-size: 32rpx;
   color: #007AFF;
   font-weight: 500;
 }
@@ -299,7 +289,6 @@
 
 .value.placeholder {
   color: #969799;
-  font-size: 28rpx;
 }
 
 .popup-container {
@@ -330,5 +319,54 @@
 .radio-group {
   display: flex;
   gap: 20px;
+}
+
+.value-wrapper .value {
+  max-width: 400rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 地址显示样式 */
+.address-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.address-value {
+  color: #323233;
+  text-align: right;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.copy-btn, .call-btn {
+  font-size: var(--small-font-size);
+  color: #007AFF;
+  padding: 4rpx 12rpx;
+  background: #e8f3ff;
+  border-radius: 4rpx;
+  flex-shrink: 0;
+}
+
+.dispatch-links {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.dispatch-link {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: var(--desc-font-size);
+  color: #323233;
+  background: #f7f8fa;
+  border-radius: 8rpx;
 }
  

@@ -6,4 +6,4 @@ export const getEnums = () => {
     url: '/enums',
     method: 'GET'
   });
-}; 
+};

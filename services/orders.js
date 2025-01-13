@@ -5,7 +5,7 @@ export const getOrders = (params) => {
   return request({
     url: '/orders',
     method: 'GET',
-    data: params
+    params: params
   });
 };
 
@@ -76,5 +76,13 @@ export const getOrderStatistics = () => {
   return request({
     url: '/orders/statistics/count',
     method: 'GET'
+  });
+};
+
+// 取消订单
+export const cancelOrder = (orderId) => {
+  return request({
+    url: `/orders/${orderId}/cancel`,
+    method: 'POST'
   });
 }; 

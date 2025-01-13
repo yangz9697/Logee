@@ -1,5 +1,5 @@
 import { formatTimestamp } from '../../utils/date';
-import { getOrders, getOrderStatistics } from '../../services/orders';
+import { getOrders, getOrderStatistics, cancelOrder } from '../../services/orders';
 
 Page({
   data: {
@@ -17,6 +17,30 @@ Page({
       completed: 0,
       total: 0
     }
+  },
+
+  onLoad() {
+    // 从本地存储获取用户信息，判断是否是管理员
+    const userInfo = wx.getStorageSync('userInfo');
+    this.setData({
+      isAdmin: userInfo.roleName === '管理员'
+    });
+
+    // 初始加载进行中的订单
+    this.loadOrders('processing');
+    this.loadOrderCounts();
+  },
+
+  onShow() {
+    // 每次显示页面时刷新当前 tab 的数据
+    const status = this.data.tabs[this.data.activeTab].value;
+    // 同时刷新订单列表和订单数量
+    Promise.all([
+      this.loadOrders(status),
+      this.loadOrderCounts()
+    ]).catch(error => {
+      console.error('刷新数据失败:', error);
+    });
   },
 
   // 下拉刷新
@@ -46,8 +70,9 @@ Page({
   async loadOrders(status) {
     try {
       this.setData({ isLoading: true });
-      const res = await getOrders({ status });
-      console.log('加载订单数据:', res);
+      // 只有当状态不是 'all' 时才传递 status 参数
+      const params = status === 'all' ? {} : { status };
+      const res = await getOrders(params);
       
       // 处理订单数据，添加格式化的时间
       const orders = res.map(order => ({
@@ -69,35 +94,21 @@ Page({
     }
   },
 
+  // 加载订单数量统计
+  async loadOrderCounts() {
+    try {
+      const res = await getOrderStatistics();
+      this.setData({ orderCounts: res });
+    } catch (error) {
+      console.error('加载订单数量统计失败:', error);
+    }
+  },
+
   onTabChange(e) {
     const index = e.currentTarget.dataset.index;
     this.setData({ activeTab: index });
     // 切换 tab 时重新加载数据
     this.loadOrders(this.data.tabs[index].value);
-  },
-
-  onLoad() {
-    // 从本地存储获取用户信息，判断是否是管理员
-    const userInfo = wx.getStorageSync('userInfo');
-    this.setData({
-      isAdmin: userInfo.roleName === '管理员'
-    });
-
-    // 初始加载进行中的订单
-    this.loadOrders('processing');
-    this.loadOrderCounts();
-  },
-
-  onShow() {
-    // 每次显示页面时刷新当前 tab 的数据
-    const status = this.data.tabs[this.data.activeTab].value;
-    // 同时刷新订单列表和订单数量
-    Promise.all([
-      this.loadOrders(status),
-      this.loadOrderCounts()
-    ]).catch(error => {
-      console.error('刷新数据失败:', error);
-    });
   },
 
   onOrderClick(e) {
@@ -121,14 +132,36 @@ Page({
     return formatTimestamp(msTimestamp, 'YYYY-MM-DD HH:mm');
   },
 
-  // 加载订单数量统计
-  async loadOrderCounts() {
-    try {
-      const res = await getOrderStatistics();
-      
-      this.setData({ orderCounts: res });
-    } catch (error) {
-      console.error('加载订单数量统计失败:', error);
-    }
+  async onCancelOrder(e) {
+    const id = e.currentTarget.dataset.id;
+    const that = this;
+    wx.showModal({
+      title: '提示',
+      content: '确定要取消该订单吗？',
+      async success(res) {
+        if (res.confirm) {
+          try {
+            wx.showLoading({ title: '处理中...' });
+            await cancelOrder(id);
+            
+            wx.showToast({
+              title: '已取消订单',
+              icon: 'success'
+            });
+            
+            // 重新加载列表
+            that.loadOrders(that.data.tabs[that.data.activeTab].value);
+          } catch (error) {
+            console.error('取消订单失败:', error);
+            wx.showToast({
+              title: error.message || '取消失败',
+              icon: 'none'
+            });
+          } finally {
+            wx.hideLoading();
+          }
+        }
+      }
+    });
   }
 }); 
