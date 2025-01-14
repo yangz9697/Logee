@@ -1,7 +1,29 @@
 <!--pages/analysis/index.wxml-->
 <view class="container">
-  <van-cell-group>
-    <van-cell title="线路分析" size="large" />
-    <van-cell title="功能开发中" label="敬请期待" />
-  </van-cell-group>
+  <block wx:for="{{lines}}" wx:key="startSite.id">
+    <view class="start-site">{{item.startSite.name}}</view>
+    <view class="line-item" 
+      wx:for="{{item.lines}}" 
+      wx:key="id"
+      wx:for-item="line"
+    >
+      <view class="route-info">
+        <text>{{line.endSite.name}}</text>
+      </view>
+
+      <view class="capacity-info">
+        <view class="capacity-item">
+          <text class="value {{line.usedCapacity > 0 ? 'warning' : ''}}">{{line.usedCapacity}}吨</text>
+        </view>
+        <view class="capacity-item">
+          <text class="value {{line.availableCapacity === 0 ? 'error' : ''}}">{{line.availableCapacity}}吨</text>
+        </view>
+        <view class="capacity-item">
+          <text class="value">{{line.orderCount}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <van-empty wx:if="{{lines.length === 0}}" description="暂无数据" />
 </view>

@@ -49,4 +49,12 @@ export const updateLinePrice = (id, data) => {
     method: 'PATCH',
     data
   });
+};
+
+// 获取线路仓位统计
+export const getLinesCapacity = () => {
+  return request({
+    url: '/lines/capacity',
+    method: 'GET'
+  });
 }; 

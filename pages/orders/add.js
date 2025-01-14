@@ -61,13 +61,23 @@ Page({
         // 设置站点数据并默认选中第一个站点
         const firstStation = sites[0];
         const firstDestination = firstStation.destinations[0];
+        const lineId = firstDestination.lineId;
+        if (!lineId) {
+          console.error('Missing lineId in destination:', firstDestination);
+        }
+
         this.setData({
           stations: sites,
           pickupStationId: firstStation.id,
           pickupSiteName: firstStation.name,
           availableDestinations: firstStation.destinations,
           deliveryStationId: firstDestination.id,
-          deliverySiteName: firstDestination.name
+          deliverySiteName: firstDestination.name,
+          selectedDestination: {
+            id: firstDestination.id,
+            name: firstDestination.name,
+            lineId: lineId
+          }
         });
       } else {
         throw new Error('Invalid response format');
@@ -124,7 +134,8 @@ Page({
         },
         shipper: this.data.shipper,
         arrivalTime: Math.floor(new Date(this.data.arrivalTime).getTime() / 1000),  // 转换为秒级时间戳
-        paymentMethod: this.data.paymentMethod
+        paymentMethod: this.data.paymentMethod,
+        lineId: this.data.selectedDestination.lineId
       };
 
       const res = await createOrder(data);
@@ -211,7 +222,12 @@ Page({
     const station = e.currentTarget.dataset.station;
     this.setData({
       deliveryStationId: station.id,
-      deliverySiteName: station.name
+      deliverySiteName: station.name,
+      selectedDestination: {
+        id: station.id,
+        name: station.name,
+        lineId: station.lineId
+      }
     });
   },
 
@@ -285,5 +301,19 @@ Page({
         icon: 'none'
       });
     }
+  },
+
+  onDestinationChange(e) {
+    const destination = this.data.destinations.find(
+      item => item.id === e.detail
+    );
+    this.setData({
+      selectedDestination: {
+        id: destination.id,
+        name: destination.name,
+        price: destination.price,
+        lineId: destination.lineId
+      }
+    });
   },
 }); 

@@ -80,7 +80,7 @@
 				"pagePath": "pages/analysis/index",
 				"iconPath": "assets/icons/warehouse.png",
 				"selectedIconPath": "assets/icons/warehouse-active.png",
-				"text": "线路分析"
+				"text": "仓位看板"
 			},
 			{
 				"pagePath": "pages/profile/index",
