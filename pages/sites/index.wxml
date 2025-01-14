@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="site-list">
+    <view class="site-item" wx:for="{{sites}}" wx:key="id">
+      <view class="site-info" bindtap="onSiteClick" data-id="{{item.id}}">
+        <view class="site-name">{{item.name}}</view>
+        <view class="site-address">{{item.location}}</view>
+      </view>
+      <view class="site-actions">
+        <van-icon 
+          name="delete-o" 
+          size="20px" 
+          color="#ee0a24" 
+          bindtap="onDeleteSite" 
+          data-site="{{item}}"
+        />
+      </view>
+    </view>
+  </view>
+  <van-dialog id="van-dialog" />
+</view> 

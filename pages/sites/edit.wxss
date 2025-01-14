@@ -1,0 +1,65 @@
+.container {
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.footer-action {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.footer-btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #ffffff;
+  background: #007AFF;
+  border-radius: 8rpx;
+}
+
+/* 搜索弹窗样式 */
+.search-container {
+  padding-bottom: env(safe-area-inset-bottom);
+  min-height: 60vh;
+}
+
+.search-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #ffffff;
+  padding: 24rpx;
+}
+
+.search-results {
+  max-height: calc(60vh - 108rpx);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.result-item {
+  padding: 24rpx 32rpx;
+  border-bottom: 2rpx solid #f5f7fa;
+}
+
+.result-item:active {
+  background: #f7f8fa;
+}
+
+.result-name {
+  font-size: 28rpx;
+  color: #323233;
+  margin-bottom: 8rpx;
+}
+
+.result-address {
+  font-size: 24rpx;
+  color: #969799;
+} 

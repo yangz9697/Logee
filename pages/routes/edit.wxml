@@ -1,0 +1,121 @@
+<view class="container">
+  <view class="card" wx:if="{{id}}">
+    <van-cell 
+      title="删除线路" 
+      title-class="delete-title"
+      border="{{ false }}"
+      bind:click="onDeleteRoute"
+    >
+      <van-icon 
+        name="delete" 
+        color="#ee0a24" 
+        size="36rpx"
+      />
+    </van-cell>
+  </view>
+
+  <view class="divider" wx:if="{{id}}"></view>
+
+  <view class="card">
+    <van-cell-group>
+      <van-cell 
+        title="始发站点" 
+        is-link
+        value="{{startSiteName || '请选择'}}"
+        bind:click="showStartSitePopup"
+        required
+      />
+      <van-cell 
+        title="到达站点" 
+        is-link
+        value="{{endSiteName || '请选择'}}"
+        bind:click="showEndSitePopup"
+        required
+      />
+    </van-cell-group>
+
+    <van-cell-group>
+      <van-field
+        label="运价"
+        type="digit"
+        value="{{form.price}}"
+        placeholder="请输入运价"
+        bind:change="onPriceChange"
+        required
+      >
+        <text slot="right-icon">/吨</text>
+      </van-field>
+
+      <van-field
+        label="仓位"
+        type="digit"
+        value="{{form.capacity}}"
+        placeholder="请输入仓位"
+        bind:change="onCapacityChange"
+        required
+      >
+        <text slot="right-icon">吨</text>
+      </van-field>
+    </van-cell-group>
+  </view>
+
+  <view class="footer-action">
+    <view class="footer-btn" bindtap="onSubmit">
+      保存
+    </view>
+  </view>
+</view>
+
+<!-- 始发站点选择弹窗 -->
+<van-popup
+  show="{{ showStartSitePopup }}"
+  position="bottom"
+  round
+  bind:close="onStartSitePopupClose"
+>
+  <view class="popup-container">
+    <view class="popup-header">
+      <view class="popup-title">选择始发站点</view>
+      <view class="popup-close" bindtap="onStartSitePopupClose">取消</view>
+    </view>
+    <view class="site-list">
+      <view 
+        class="site-item {{form.startSiteId === item.id ? 'active' : ''}}"
+        wx:for="{{sites}}"
+        wx:key="id"
+        bindtap="onStartSiteChange"
+        data-site="{{item}}"
+      >
+        <view class="site-name">{{item.name}}</view>
+        <view class="site-address">{{item.city}}</view>
+      </view>
+    </view>
+  </view>
+</van-popup>
+
+<!-- 到达站点选择弹窗 -->
+<van-popup
+  show="{{ showEndSitePopup }}"
+  position="bottom"
+  round
+  bind:close="onEndSitePopupClose"
+>
+  <view class="popup-container">
+    <view class="popup-header">
+      <view class="popup-title">选择到达站点</view>
+      <view class="popup-close" bindtap="onEndSitePopupClose">取消</view>
+    </view>
+    <view class="site-list">
+      <view 
+        class="site-item {{form.endSiteId === item.id ? 'active' : ''}}"
+        wx:for="{{sites}}"
+        wx:key="id"
+        bindtap="onEndSiteChange"
+        data-site="{{item}}"
+      >
+        <view class="site-name">{{item.name}}</view>
+        <view class="site-address">{{item.city}}</view>
+      </view>
+    </view>
+  </view>
+</van-popup> 

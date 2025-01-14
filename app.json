@@ -12,7 +12,11 @@
 		"pages/analysis/index",
 		"pages/profile/index",
 		"pages/login/index",
-		"pages/register/index"
+		"pages/register/index",
+		"pages/sites/index",
+		"pages/sites/edit",
+		"pages/routes/index",
+		"pages/routes/edit"
 	],
 	"usingComponents": {
 		"van-button": "@vant/weapp/button/index",
@@ -85,5 +89,5 @@
 				"text": "我的"
 			}
 		]
-    }
+	}
 }

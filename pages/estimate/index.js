@@ -336,5 +336,40 @@ Page({
       endPointIndex: 0,
       currentPrice: mode === 'all' ? selectedOrigin.destinations[0].price : selectedOrigin.destination[0].price
     });
+  },
+
+  async loadDestinations(startSiteId) {
+    try {
+      const destinations = await getSiteDestinations(startSiteId);
+      this.setData({
+        destinations: destinations.map(item => ({
+          ...item,
+          lineId: item.id,
+          id: item.site.id,
+          name: item.site.name,
+          price: item.price
+        }))
+      });
+    } catch (error) {
+      console.error('加载目的地列表失败:', error);
+      wx.showToast({
+        title: error.message || '加载失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  onDestinationChange(e) {
+    const destination = this.data.destinations.find(
+      item => item.id === e.detail
+    );
+    this.setData({
+      selectedDestination: {
+        id: destination.id,
+        name: destination.name,
+        price: destination.price,
+        lineId: destination.lineId
+      }
+    });
   }
 }); 

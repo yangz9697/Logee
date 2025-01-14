@@ -99,5 +99,17 @@ Page({
         } finally {
             wx.hideLoading();
         }
+    },
+
+    goToSites() {
+        wx.navigateTo({
+            url: '/pages/sites/index'
+        });
+    },
+
+    goToRoutes() {
+        wx.navigateTo({
+            url: '/pages/routes/index'
+        });
     }
 })

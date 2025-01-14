@@ -13,7 +13,18 @@
 
   <!-- 功能列表 -->
   <view class="function-list">
-    <!-- 可以添加其他功能按钮 -->
+    <van-cell-group>
+      <van-cell 
+        title="站点管理" 
+        is-link
+        bind:click="goToSites"
+      />
+      <van-cell 
+        title="线路管理" 
+        is-link
+        bind:click="goToRoutes"
+      />
+    </van-cell-group>
   </view>
 
   <!-- 退出登录按钮 -->

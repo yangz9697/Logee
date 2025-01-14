@@ -1,0 +1,72 @@
+.container {
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.delete-btn {
+  width: 65px;
+  height: 100%;
+  background-color: #ee0a24;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.footer-action {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.footer-btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #ffffff;
+  background: #007AFF;
+  border-radius: 8rpx;
+}
+
+.site-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  background: #ffffff;
+  margin-bottom: 2rpx;
+}
+
+.site-info {
+  flex: 1;
+}
+
+.site-name {
+  font-size: 28rpx;
+  color: #323233;
+  margin-bottom: 8rpx;
+}
+
+.site-address {
+  font-size: 24rpx;
+  color: #969799;
+}
+
+.site-actions {
+  padding-left: 24rpx;
+} 

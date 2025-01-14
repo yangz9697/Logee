@@ -1,0 +1,115 @@
+<view class="container">
+  <van-cell-group>
+    <van-field
+      label="站点名称"
+      value="{{ form.name }}"
+      placeholder="请输入站点名称"
+      bind:change="onNameChange"
+      required
+    />
+    <van-field
+      label="所在城市"
+      value="{{ form.city }}"
+      placeholder="请输入所在城市"
+      bind:change="onCityChange"
+      required
+    />
+    <van-field
+      label="详细地址"
+      value="{{ form.location }}"
+      type="textarea"
+      autosize
+      placeholder="请输入详细地址"
+      bind:change="onLocationChange"
+      required
+    />
+    <van-cell 
+      title="地图定位" 
+      required
+      value="{{form.latitude ? '已选择' : '请选择'}}"
+      is-link
+      bind:click="showAddressSearch"
+    />
+    <van-field
+      label="白班联系人"
+      value="{{ form.dayShiftContact }}"
+      placeholder="请输入白班联系人"
+      bind:change="onDayShiftContactChange"
+      required
+    />
+    <van-field
+      label="白班电话"
+      value="{{ form.dayShiftPhone }}"
+      type="number"
+      maxlength="11"
+      placeholder="请输入白班联系电话"
+      bind:change="onDayShiftPhoneChange"
+      required
+    />
+    <van-field
+      label="晚班联系人"
+      value="{{ form.nightShiftContact }}"
+      placeholder="请输入晚班联系人"
+      bind:change="onNightShiftContactChange"
+      required
+    />
+    <van-field
+      label="晚班电话"
+      value="{{ form.nightShiftPhone }}"
+      type="number"
+      maxlength="11"
+      placeholder="请输入晚班联系电话"
+      bind:change="onNightShiftPhoneChange"
+      required
+    />
+    <van-field
+      label="自提电话"
+      value="{{ form.selfPickupPhone }}"
+      type="number"
+      maxlength="11"
+      placeholder="请输入自提联系电话"
+      bind:change="onSelfPickupPhoneChange"
+      required
+    />
+  </van-cell-group>
+
+  <view class="footer-action">
+    <view class="footer-btn" bindtap="onSubmit">
+      保存
+    </view>
+  </view>
+
+  <!-- 地址搜索弹窗 -->
+  <van-popup
+    show="{{ showAddressPopup }}"
+    position="bottom"
+    round
+    bind:close="onAddressPopupClose"
+    custom-style="height: 80%"
+  >
+    <view class="search-container">
+      <view class="search-header">
+        <van-search
+          value="{{ searchValue }}"
+          placeholder="请输入地址关键词"
+          bind:search="onSearchAddress"
+          bind:change="onSearchAddress"
+          shape="round"
+          show-action="{{false}}"
+        />
+      </view>
+      <view class="search-results">
+        <view 
+          wx:for="{{searchResults}}" 
+          wx:key="id"
+          class="result-item"
+          bindtap="onSelectAddress"
+          data-item="{{item}}"
+        >
+          <view class="result-name">{{item.name}}</view>
+          <view class="result-address">{{item.district || '暂无详细地址'}}</view>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+</view> 
