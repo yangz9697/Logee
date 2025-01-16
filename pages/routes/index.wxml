@@ -1,86 +1,49 @@
 <!--pages/routes/index.wxml-->
 <view class="container">
-  <block wx:if="{{routes.length > 0}}">
-    <view class="card">
-      <view class="station-section">
-        <view class="station-group">
-          <view class="station-label">始发站点</view>
-          <view class="destination-grid">
-            <view
-              wx:for="{{routes}}"
-              wx:key="startSite.id"
-              class="grid-item {{selectedStartSite.startSite.id === item.startSite.id ? 'active' : ''}}"
-              bindtap="onStartSiteChange"
-              data-site="{{item}}"
-            >
-              <view>
-                <text class="city-name">{{item.startSite.name}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <view class="station-group">
-          <view class="station-label">到达站点</view>
-          <view class="destination-grid">
-            <view
-              wx:for="{{selectedStartSite.endSites}}"
-              wx:key="site.id"
-              class="grid-item {{selectedEndSite.site.id === item.site.id ? 'active' : ''}}"
-              bindtap="onEndSiteChange"
-              data-site="{{item}}"
-            >
-              <view>
-                <text class="city-name">{{item.site.name}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <view class="line-info" wx:if="{{selectedEndSite}}">
-          <view class="info-item">
-            <text class="label">运价：</text>
-            <view class="value-edit">
-              <input 
-                class="price-input" 
-                type="digit" 
-                value="{{selectedEndSite.price}}"
-                bindblur="onPriceChange"
-              />
-              <text>/吨</text>
-            </view>
-          </view>
-          <view class="info-item">
-            <text class="label">仓位：</text>
-            <view class="value-edit">
-              <input 
-                class="capacity-input" 
-                type="digit" 
-                value="{{selectedEndSite.capacity}}"
-                bindblur="onCapacityChange"
-              />
-              <text>吨</text>
-            </view>
-          </view>
-        </view>
+  <block wx:for="{{routes}}" wx:key="id" wx:for-item="route">
+    <view class="start-site">
+      <view class="site-header">
+        <text>{{route.startSite.name}}</text>
       </view>
     </view>
 
-    <view class="footer-action">
-      <view class="footer-btns">
-        <view class="delete-btn" bindtap="onDeleteRoute" wx:if="{{selectedEndSite}}">
-          <van-icon name="delete" color="#ee0a24" size="36rpx" />
-          <text>删除线路</text>
+    <view class="line-list">
+      <view 
+        class="line-item"
+        wx:for="{{route.endSites}}"
+        wx:key="id"
+        wx:for-item="line"
+        wx:for-index="lineIndex"
+        bindtap="onEditLine"
+        data-route-index="{{index}}"
+        data-line-index="{{lineIndex}}"
+      >
+        <view class="line-info">
+          <view class="route-info">
+            <text>{{line.site.name}}</text>
+            <text class="separator">|</text>
+            <text>{{line.price}}元/吨</text>
+          </view>
         </view>
-        <view class="{{selectedEndSite ? 'add-btn' : 'footer-btn'}}" bindtap="onAddRoute">
-          新增线路
+        <view class="line-actions">
+          <van-switch
+            checked="{{!line.disabled}}"
+            size="20px"
+            bind:change="onToggleLine"
+            data-route-index="{{index}}"
+            data-line-index="{{lineIndex}}"
+            catchtap
+          />
         </view>
       </view>
     </view>
   </block>
 
-  <van-empty
-    wx:else
-    description="暂无线路"
-  />
+  <van-empty wx:if="{{!loading && routes.length === 0}}" description="暂无线路" />
+  
+  <view class="footer-action">
+    <view class="footer-btn" bindtap="onAddRoute">新增线路</view>
+  </view>
+
+  <van-dialog id="van-dialog" />
 </view>

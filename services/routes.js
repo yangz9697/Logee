@@ -57,4 +57,13 @@ export const getLinesCapacity = () => {
     url: '/lines/capacity',
     method: 'GET'
   });
+};
+
+// 更新线路状态（启用/禁用）
+export const updateLineStatus = (lineId, data) => {
+  return request({
+    url: `/lines/${lineId}/status`,
+    method: 'PATCH',
+    data
+  });
 }; 

@@ -67,5 +67,18 @@ Page({
     }).catch(() => {
       // 点击取消，不做任何操作
     });
+  },
+
+  navigateToAdd() {
+    wx.navigateTo({
+      url: '/pages/sites/edit'
+    })
+  },
+
+  onSiteClick(e) {
+    const { id } = e.currentTarget.dataset;
+    wx.navigateTo({
+      url: `/pages/sites/edit?id=${id}`
+    });
   }
 }); 

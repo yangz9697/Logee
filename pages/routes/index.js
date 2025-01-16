@@ -1,5 +1,6 @@
 // pages/routes/index.js
-import { getRoutes, deleteRoute, updateLinePrice } from '../../services/routes';
+import { getRoutes, deleteRoute, updateLinePrice, updateLineStatus } from '../../services/routes';
+import Dialog from '@vant/weapp/dialog/dialog';
 
 Page({
 
@@ -9,8 +10,6 @@ Page({
     data: {
         routes: [],
         loading: false,
-        selectedStartSite: null,
-        selectedEndSite: null
     },
 
     /**
@@ -73,12 +72,14 @@ Page({
         try {
             this.setData({ loading: true });
             const routes = await getRoutes();
-            const firstStartSite = routes[0];
-            const firstEndSite = firstStartSite?.endSites[0];
             this.setData({ 
-                routes: routes,
-                selectedStartSite: firstStartSite,
-                selectedEndSite: firstEndSite
+                routes: routes.map(route => ({
+                    ...route,
+                    endSites: route.endSites.map(site => ({
+                        ...site,
+                        disabled: !site.enabled
+                    }))
+                }))
             });
         } catch (error) {
             console.error('加载线路列表失败:', error);
@@ -231,5 +232,79 @@ Page({
                 icon: 'none'
             });
         }
+    },
+
+    async onToggleLine(e) {
+        const { routeIndex, lineIndex } = e.currentTarget.dataset;
+        const line = this.data.routes[routeIndex].endSites[lineIndex];
+        const enabled = e.detail;
+        console.log(line, enabled);
+        try {
+            await updateLineStatus(line.id, { enabled });
+            
+            // 更新本地数据
+            this.setData({
+                [`routes[${routeIndex}].endSites[${lineIndex}].disabled`]: !enabled
+            });
+
+            wx.showToast({
+                title: enabled ? '已启用' : '已禁用',
+                icon: 'success'
+            });
+        } catch (error) {
+            console.error('更新状态失败:', error);
+            wx.showToast({
+                title: error.message || '操作失败',
+                icon: 'none'
+            });
+        }
+    },
+
+    onDeleteLine(e) {
+        const { routeIndex, lineIndex } = e.currentTarget.dataset;
+        const line = this.data.routes[routeIndex].endSites[lineIndex];
+        
+        Dialog.confirm({
+            title: '确认删除',
+            message: `确定要删除 ${this.data.routes[routeIndex].startSite.name} → ${line.site.name} 线路吗？`,
+        }).then(async () => {
+            try {
+                await deleteRoute(line.id);
+                
+                // 更新本地数据
+                const routes = [...this.data.routes];
+                routes[routeIndex].endSites.splice(lineIndex, 1);
+                this.setData({ routes });
+
+                wx.showToast({
+                    title: '删除成功',
+                    icon: 'success'
+                });
+            } catch (error) {
+                console.error('删除失败:', error);
+                wx.showToast({
+                    title: error.message || '删除失败',
+                    icon: 'none'
+                });
+            }
+        });
+    },
+
+    onEditLine(e) {
+        const { routeIndex, lineIndex } = e.currentTarget.dataset;
+        const route = this.data.routes[routeIndex];
+        const line = route.endSites[lineIndex];
+        
+        wx.navigateTo({
+            url: `/pages/routes/edit?id=${line.id}&startSiteId=${route.startSite.id}&endSiteId=${line.site.id}`
+        });
+    },
+
+    // 阻止switch点击事件冒泡
+    onSwitchTap(e) {
+        if (e && e.stopPropagation) {
+            e.stopPropagation();
+        }
+        return false;  // 返回 false 也可以阻止冒泡
     }
 })

@@ -19,16 +19,16 @@
   <view class="card">
     <van-cell-group>
       <van-cell 
-        title="始发站点" 
+        title="起始站点" 
+        value="{{route.startSite.name || '请选择'}}"
         is-link
-        value="{{startSiteName || '请选择'}}"
-        bind:click="showStartSitePopup"
         required
+        bind:click="showStartSitePopup"
       />
       <van-cell 
         title="到达站点" 
         is-link
-        value="{{endSiteName || '请选择'}}"
+        value="{{route.endSite.name || '请选择'}}"
         bind:click="showEndSitePopup"
         required
       />
@@ -73,21 +73,20 @@
   round
   bind:close="onStartSitePopupClose"
 >
-  <view class="popup-container">
-    <view class="popup-header">
-      <view class="popup-title">选择始发站点</view>
-      <view class="popup-close" bindtap="onStartSitePopupClose">取消</view>
+  <view class="site-picker">
+    <view class="site-picker-header">
+      <text>选择起始站点</text>
     </view>
     <view class="site-list">
       <view 
-        class="site-item {{form.startSiteId === item.id ? 'active' : ''}}"
-        wx:for="{{sites}}"
+        wx:for="{{sites}}" 
         wx:key="id"
-        bindtap="onStartSiteChange"
+        class="site-item"
+        bindtap="onStartSiteSelect"
         data-site="{{item}}"
       >
-        <view class="site-name">{{item.name}}</view>
-        <view class="site-address">{{item.city}}</view>
+        <text>{{item.name}}</text>
+        <text class="site-address">{{item.location}}</text>
       </view>
     </view>
   </view>
@@ -100,21 +99,20 @@
   round
   bind:close="onEndSitePopupClose"
 >
-  <view class="popup-container">
-    <view class="popup-header">
-      <view class="popup-title">选择到达站点</view>
-      <view class="popup-close" bindtap="onEndSitePopupClose">取消</view>
+  <view class="site-picker">
+    <view class="site-picker-header">
+      <text>选择到达站点</text>
     </view>
     <view class="site-list">
       <view 
-        class="site-item {{form.endSiteId === item.id ? 'active' : ''}}"
         wx:for="{{sites}}"
         wx:key="id"
-        bindtap="onEndSiteChange"
+        class="site-item"
+        bindtap="onEndSiteSelect"
         data-site="{{item}}"
       >
-        <view class="site-name">{{item.name}}</view>
-        <view class="site-address">{{item.city}}</view>
+        <text>{{item.name}}</text>
+        <text class="site-address">{{item.location}}</text>
       </view>
     </view>
   </view>

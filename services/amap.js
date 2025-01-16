@@ -77,6 +77,39 @@ const amapService = {
         fail: reject
       });
     });
+  },
+
+  // 直接调用高德地图 API
+  searchAddress({ keywords, city }) {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: 'https://restapi.amap.com/v3/place/text',
+        data: {
+          key: 'YOUR_AMAP_KEY', // 替换为您的高德地图 key
+          keywords,
+          city,
+          offset: 20,
+          page: 1,
+          extensions: 'all'
+        },
+        success: (res) => {
+          if (res.data && res.data.pois) {
+            const results = res.data.pois.map(item => ({
+              id: item.id,
+              name: item.name,
+              district: item.address,
+              address: item.address,
+              latitude: item.location.split(',')[1],
+              longitude: item.location.split(',')[0]
+            }));
+            resolve(results);
+          } else {
+            reject(new Error('搜索失败'));
+          }
+        },
+        fail: reject
+      });
+    });
   }
 };
 

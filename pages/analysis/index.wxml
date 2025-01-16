@@ -13,14 +13,11 @@
 
       <view class="capacity-info">
         <view class="capacity-item">
-          <text class="value {{line.usedCapacity > 0 ? 'warning' : ''}}">{{line.usedCapacity}}吨</text>
+          <text class="value {{line.usedCapacity > 0 ? 'warning' : ''}}">仓位：{{line.usedCapacity}}/{{line.availableCapacity}}吨</text>
         </view>
-        <view class="capacity-item">
-          <text class="value {{line.availableCapacity === 0 ? 'error' : ''}}">{{line.availableCapacity}}吨</text>
-        </view>
-        <view class="capacity-item">
-          <text class="value">{{line.orderCount}}</text>
-        </view>
+        <!-- <view class="capacity-item">
+          <text class="value">在仓订单数：{{line.orderCount}}</text>
+        </view> -->
       </view>
     </view>
   </block>

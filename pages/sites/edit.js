@@ -1,10 +1,10 @@
-import { getSites, getSiteById, createSite, updateSite } from '../../services/sites';
+import { getSite, createSite, updateSite } from '../../services/sites';
 import amapService from '../../services/amap';
 
 Page({
   data: {
-    id: '',
-    form: {
+    id: null,
+    site: {
       name: '',
       city: '',
       location: '',
@@ -16,219 +16,184 @@ Page({
       nightShiftPhone: '',
       selfPickupPhone: ''
     },
+    loading: false,
     showAddressPopup: false,
     searchValue: '',
-    searchResults: [],
-    searchTimer: null
+    searchResults: []
   },
 
-  async onLoad(options) {
-    await this.loadSites();
-
+  onLoad(options) {
     if (options.id) {
       this.setData({ id: options.id });
-      this.loadSiteDetail(options.id);
+      this.loadSite();
+    }
+    wx.setNavigationBarTitle({
+      title: options.id ? '编辑站点' : '新增站点'
+    });
+  },
+
+  async loadSite() {
+    if (!this.data.id) return;
+    
+    try {
+      this.setData({ loading: true });
+      const site = await getSite(this.data.id);
+      this.setData({ site });
+    } catch (error) {
+      console.error('加载站点信息失败:', error);
+      wx.showToast({
+        title: error.message || '加载失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ loading: false });
     }
   },
 
-  // 搜索地址
-  onSearchAddress(e) {
-    const value = e.detail;
-    this.setData({ searchValue: value });
-
-    // 防抖处理
-    if (this.data.searchTimer) {
-      clearTimeout(this.data.searchTimer);
-    }
-
-    if (!value) {
-      this.setData({ searchResults: [] });
-      return;
-    }
-
-    this.data.searchTimer = setTimeout(async () => {
-      try {
-        const results = await amapService.searchPOI(value);
-        this.setData({ searchResults: results });
-      } catch (error) {
-        console.error('搜索地址失败:', error);
-        wx.showToast({
-          title: '搜索失败',
-          icon: 'none'
-        });
-      }
-    }, 500);
-  },
-
-  // 选择地址
-  onSelectAddress(e) {
-    const { item } = e.currentTarget.dataset;
+  onNameChange(e) {
     this.setData({
-      'form.latitude': item.location.lat,
-      'form.longitude': item.location.lng,
+      'site.name': e.detail
+    });
+  },
+
+  onCityChange(e) {
+    this.setData({
+      'site.city': e.detail
+    });
+  },
+
+  onLocationChange(e) {
+    this.setData({
+      'site.location': e.detail
+    });
+  },
+
+  onDayShiftContactChange(e) {
+    this.setData({
+      'site.dayShiftContact': e.detail
+    });
+  },
+
+  onDayShiftPhoneChange(e) {
+    this.setData({
+      'site.dayShiftPhone': e.detail
+    });
+  },
+
+  onNightShiftContactChange(e) {
+    this.setData({
+      'site.nightShiftContact': e.detail
+    });
+  },
+
+  onNightShiftPhoneChange(e) {
+    this.setData({
+      'site.nightShiftPhone': e.detail
+    });
+  },
+
+  onSelfPickupPhoneChange(e) {
+    this.setData({
+      'site.selfPickupPhone': e.detail
+    });
+  },
+
+  showAddressSearch() {
+    this.setData({ showAddressPopup: true });
+  },
+
+  onAddressPopupClose() {
+    this.setData({ 
       showAddressPopup: false,
       searchValue: '',
       searchResults: []
     });
   },
 
-  // 显示地址搜索弹窗
-  showAddressSearch() {
-    this.setData({ 
-      showAddressPopup: true,
+  async onSearchAddress(e) {
+    const value = e.detail;
+    this.setData({ searchValue: value });
+    
+    if (!value) {
+      this.setData({ searchResults: [] });
+      return;
+    }
+
+    try {
+      const results = await amapService.searchPOI(value);
+      this.setData({ searchResults: results });
+    } catch (error) {
+      console.error('搜索地址失败:', error);
+      wx.showToast({
+        title: '搜索失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  onSelectAddress(e) {
+    const { item } = e.currentTarget.dataset;
+    this.setData({
+      'site.location': item.district || item.name,
+      'site.latitude': item.location.lat,
+      'site.longitude': item.location.lng,
+      showAddressPopup: false,
       searchValue: '',
       searchResults: []
     });
   },
 
-  // 关闭地址搜索弹窗
-  onAddressPopupClose() {
-    this.setData({ showAddressPopup: false });
-  },
-
-  async loadSiteDetail(id) {
-    try {
-      wx.showLoading({ title: '加载中...' });
-      const site = await getSiteById(id);
-      // 解析联系人信息
-      const [dayContact, dayPhone] = site.dayReceiver.split('/');
-      const [nightContact, nightPhone] = site.nightReceiver.split('/');
-      const [, selfPickupPhone] = site.selfPickup.split('/');
-
-      this.setData({
-        form: {
-          name: site.name,
-          location: site.location,
-          city: site.city,
-          latitude: site.lat,
-          longitude: site.lng,
-          dayShiftContact: dayContact,
-          dayShiftPhone: dayPhone,
-          nightShiftContact: nightContact,
-          nightShiftPhone: nightPhone,
-          selfPickupPhone: selfPickupPhone
-        }
-      });
-
-    } catch (error) {
-      console.error('加载站点详情失败:', error);
+  async handleSubmit(e) {
+    const { site, id } = this.data;
+    console.log(site, id);
+    
+    // 只验证必要字段
+    if (!site.name || !site.city || !site.location || !site.latitude || !site.longitude) {
       wx.showToast({
-        title: error.message || '加载失败',
+        title: '请填写必要信息',
         icon: 'none'
       });
-    } finally {
-      wx.hideLoading();
+      return;
     }
-  },
-
-  // 表单字段变化处理
-  onNameChange(e) {
-    this.setData({ 'form.name': e.detail });
-  },
-
-  onCityChange(e) {
-    this.setData({ 'form.city': e.detail });
-  },
-
-  onLocationChange(e) {
-    this.setData({ 'form.location': e.detail });
-  },
-
-  onDayShiftContactChange(e) {
-    this.setData({ 'form.dayShiftContact': e.detail });
-  },
-
-  onDayShiftPhoneChange(e) {
-    this.setData({ 'form.dayShiftPhone': e.detail });
-  },
-
-  onNightShiftContactChange(e) {
-    this.setData({ 'form.nightShiftContact': e.detail });
-  },
-
-  onNightShiftPhoneChange(e) {
-    this.setData({ 'form.nightShiftPhone': e.detail });
-  },
-
-  onSelfPickupPhoneChange(e) {
-    this.setData({ 'form.selfPickupPhone': e.detail });
-  },
-
-  // 表单验证
-  validateForm() {
-    const { form } = this.data;
-    if (!form.name) {
-      wx.showToast({
-        title: '请输入站点名称',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.location || !form.city || !form.latitude || !form.longitude) {
-      wx.showToast({
-        title: '请选择站点地址',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.dayShiftContact || !form.dayShiftPhone) {
-      wx.showToast({
-        title: '请输入白班联系人信息',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.nightShiftContact || !form.nightShiftPhone) {
-      wx.showToast({
-        title: '请输入晚班联系人信息',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.selfPickupPhone) {
-      wx.showToast({
-        title: '请输入自提联系电话',
-        icon: 'none'
-      });
-      return false;
-    }
-    return true;
-  },
-
-  async onSubmit() {
-    if (!this.validateForm()) return;
 
     try {
       wx.showLoading({ title: '保存中...' });
       
-      // 构造API所需的数据格式
-      const apiData = {
-        name: this.data.form.name,
-        lng: this.data.form.longitude,
-        lat: this.data.form.latitude,
-        city: this.data.form.city,
-        location: this.data.form.location,
-        dayReceiver: `${this.data.form.dayShiftContact}/${this.data.form.dayShiftPhone}`,
-        nightReceiver: `${this.data.form.nightShiftContact}/${this.data.form.nightShiftPhone}`,
-        selfPickup: `自提/${this.data.form.selfPickupPhone}`
+      // 构造提交的数据，格式化为API要求的格式
+      const submitData = {
+        name: site.name,
+        city: site.city,
+        location: site.location,
+        lng: Number(site.longitude),  // 转换为数字
+        lat: Number(site.latitude),   // 转换为数字
+        // 组合联系人和电话
+        dayReceiver: site.dayShiftContact && site.dayShiftPhone ? 
+          `${site.dayShiftContact}/${site.dayShiftPhone}` : '',
+        nightReceiver: site.nightShiftContact && site.nightShiftPhone ? 
+          `${site.nightShiftContact}/${site.nightShiftPhone}` : '',
+        selfPickup: site.selfPickupPhone ? 
+          `自提/${site.selfPickupPhone}` : ''
       };
-      
-      if (this.data.id) {
-        await updateSite(this.data.id, apiData);
+
+      if (id) {
+        await updateSite(id, submitData);
       } else {
-        await createSite(apiData);
+        await createSite(submitData);
       }
 
       wx.showToast({
         title: '保存成功',
-        icon: 'success'
+        icon: 'success',
+        duration: 2000,
+        success: () => {
+          setTimeout(() => {
+            const pages = getCurrentPages();
+            const prevPage = pages[pages.length - 2];
+            prevPage.loadSites();
+            wx.navigateBack();
+          }, 2000);
+        }
       });
-
-      // 返回上一页
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
-
     } catch (error) {
       console.error('保存站点失败:', error);
       wx.showToast({
@@ -237,19 +202,6 @@ Page({
       });
     } finally {
       wx.hideLoading();
-    }
-  },
-
-  async loadSites() {
-    try {
-      const sites = await getSites();
-      this.setData({ sites });
-    } catch (error) {
-      console.error('加载站点列表失败:', error);
-      wx.showToast({
-        title: error.message || '加载失败',
-        icon: 'none'
-      });
     }
   }
 }); 

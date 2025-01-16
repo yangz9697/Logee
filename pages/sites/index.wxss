@@ -1,7 +1,14 @@
 .container {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background: #f7f8fa;
   padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+.site-list {
+  flex: 1;
+  overflow-y: auto;
 }
 
 .contact-info {

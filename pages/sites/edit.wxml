@@ -1,83 +1,86 @@
 <view class="container">
-  <van-cell-group>
-    <van-field
-      label="站点名称"
-      value="{{ form.name }}"
-      placeholder="请输入站点名称"
-      bind:change="onNameChange"
-      required
-    />
-    <van-field
-      label="所在城市"
-      value="{{ form.city }}"
-      placeholder="请输入所在城市"
-      bind:change="onCityChange"
-      required
-    />
-    <van-field
-      label="详细地址"
-      value="{{ form.location }}"
-      type="textarea"
-      autosize
-      placeholder="请输入详细地址"
-      bind:change="onLocationChange"
-      required
-    />
-    <van-cell 
-      title="地图定位" 
-      required
-      value="{{form.latitude ? '已选择' : '请选择'}}"
-      is-link
-      bind:click="showAddressSearch"
-    />
-    <van-field
-      label="白班联系人"
-      value="{{ form.dayShiftContact }}"
-      placeholder="请输入白班联系人"
-      bind:change="onDayShiftContactChange"
-      required
-    />
-    <van-field
-      label="白班电话"
-      value="{{ form.dayShiftPhone }}"
-      type="number"
-      maxlength="11"
-      placeholder="请输入白班联系电话"
-      bind:change="onDayShiftPhoneChange"
-      required
-    />
-    <van-field
-      label="晚班联系人"
-      value="{{ form.nightShiftContact }}"
-      placeholder="请输入晚班联系人"
-      bind:change="onNightShiftContactChange"
-      required
-    />
-    <van-field
-      label="晚班电话"
-      value="{{ form.nightShiftPhone }}"
-      type="number"
-      maxlength="11"
-      placeholder="请输入晚班联系电话"
-      bind:change="onNightShiftPhoneChange"
-      required
-    />
-    <van-field
-      label="自提电话"
-      value="{{ form.selfPickupPhone }}"
-      type="number"
-      maxlength="11"
-      placeholder="请输入自提联系电话"
-      bind:change="onSelfPickupPhoneChange"
-      required
-    />
-  </van-cell-group>
+  <form bindsubmit="handleSubmit">
+    <van-cell-group>
+      <van-field
+        label="站点名称"
+        value="{{ site.name }}"
+        placeholder="请输入站点名称"
+        bind:change="onNameChange"
+        required
+      />
+      
+      <van-field
+        label="所在城市"
+        value="{{ site.city }}"
+        placeholder="请输入所在城市"
+        bind:change="onCityChange"
+        required
+      />
+      
+      <van-field
+        label="详细地址"
+        value="{{ site.location }}"
+        type="textarea"
+        autosize
+        placeholder="请输入详细地址"
+        bind:change="onLocationChange"
+        required
+      />
 
-  <view class="footer-action">
-    <view class="footer-btn" bindtap="onSubmit">
-      保存
+      <van-cell 
+        title="地图定位" 
+        required
+        value="{{site.latitude ? '已选择' : '请选择'}}"
+        is-link
+        bind:click="showAddressSearch"
+      />
+      
+      <van-field
+        label="白班联系人"
+        value="{{ site.dayShiftContact }}"
+        placeholder="请输入白班联系人"
+        bind:change="onDayShiftContactChange"
+      />
+
+      <van-field
+        label="白班电话"
+        value="{{ site.dayShiftPhone }}"
+        type="number"
+        maxlength="11"
+        placeholder="请输入白班联系电话"
+        bind:change="onDayShiftPhoneChange"
+      />
+
+      <van-field
+        label="晚班联系人"
+        value="{{ site.nightShiftContact }}"
+        placeholder="请输入晚班联系人"
+        bind:change="onNightShiftContactChange"
+      />
+
+      <van-field
+        label="晚班电话"
+        value="{{ site.nightShiftPhone }}"
+        type="number"
+        maxlength="11"
+        placeholder="请输入晚班联系电话"
+        bind:change="onNightShiftPhoneChange"
+      />
+
+      <van-field
+        label="自提电话"
+        value="{{ site.selfPickupPhone }}"
+        type="number"
+        maxlength="11"
+        placeholder="请输入自提联系电话"
+        bind:change="onSelfPickupPhoneChange"
+      />
+    </van-cell-group>
+
+    <view class="footer-action">
+      <button class="footer-btn" form-type="submit">保存</button>
     </view>
-  </view>
+  </form>
 
   <!-- 地址搜索弹窗 -->
   <van-popup

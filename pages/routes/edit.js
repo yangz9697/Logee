@@ -1,132 +1,88 @@
 import { createRoute } from '../../services/routes';
 import { deleteRoute } from '../../services/routes';
 import { getSites } from '../../services/sites';
+import { getLineDetail } from '../../services/routes';
+import { updateLinePrice } from '../../services/routes';
 
 Page({
   data: {
     id: '',
-    sites: [],
-    showStartSitePopup: false,
-    showEndSitePopup: false,
-    startSiteName: '',
-    endSiteName: '',
+    startSiteId: '',
+    endSiteId: '',
+    route: {
+      startSite: {},
+      endSite: {}
+    },
     form: {
-      startSiteId: '',
-      endSiteId: '',
       price: '',
       capacity: ''
-    }
+    },
+    loading: false,
+    showStartSitePopup: false,
+    showEndSitePopup: false,
+    sites: []
   },
 
-  async onLoad(options) {
-    if (options.id) {
-      this.setData({ id: options.id });
+  onLoad(options) {
+    const { id, startSiteId, endSiteId } = options;
+    if (id) {
+      this.setData({ 
+        id,
+        startSiteId,
+        endSiteId
+      });
+      this.loadLineDetail();
     }
-    await this.loadSites();
+    this.loadSites();
   },
 
-  async loadSites() {
+  async loadLineDetail() {
     try {
-      const sites = await getSites();
-      this.setData({ sites });
+      this.setData({ loading: true });
+      const line = await getLineDetail(this.data.id);
+      this.setData({
+        form: {
+          price: line.price,
+          capacity: line.capacity
+        }
+      });
     } catch (error) {
-      console.error('加载站点列表失败:', error);
+      console.error('加载线路详情失败:', error);
       wx.showToast({
         title: error.message || '加载失败',
         icon: 'none'
       });
+    } finally {
+      this.setData({ loading: false });
     }
-  },
-
-  showStartSitePopup() {
-    this.setData({ showStartSitePopup: true });
-  },
-
-  onStartSitePopupClose() {
-    this.setData({ showStartSitePopup: false });
-  },
-
-  showEndSitePopup() {
-    this.setData({ showEndSitePopup: true });
-  },
-
-  onEndSitePopupClose() {
-    this.setData({ showEndSitePopup: false });
-  },
-
-  onStartSiteChange(e) {
-    const { site } = e.currentTarget.dataset;
-    this.setData({ 
-      'form.startSiteId': site.id,
-      startSiteName: site.name,
-      showStartSitePopup: false
-    });
-  },
-
-  onEndSiteChange(e) {
-    const { site } = e.currentTarget.dataset;
-    this.setData({ 
-      'form.endSiteId': site.id,
-      endSiteName: site.name,
-      showEndSitePopup: false
-    });
-  },
-
-  onPriceChange(e) {
-    this.setData({ 'form.price': e.detail });
-  },
-
-  onCapacityChange(e) {
-    this.setData({ 'form.capacity': e.detail });
-  },
-
-  validateForm() {
-    const { form } = this.data;
-    if (!form.startSiteId) {
-      wx.showToast({
-        title: '请选择始发站点',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.endSiteId) {
-      wx.showToast({
-        title: '请选择到达站点',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) {
-      wx.showToast({
-        title: '请输入有效的运价',
-        icon: 'none'
-      });
-      return false;
-    }
-    if (!form.capacity || isNaN(Number(form.capacity)) || Number(form.capacity) <= 0) {
-      wx.showToast({
-        title: '请输入有效的仓位',
-        icon: 'none'
-      });
-      return false;
-    }
-    return true;
   },
 
   async onSubmit() {
-    if (!this.validateForm()) return;
+    const { startSiteId, endSiteId, form } = this.data;
+    console.log('提交数据:', { startSiteId, endSiteId, form });
+    
+    if (!startSiteId || !endSiteId || !form.price || !form.capacity) {
+      wx.showToast({
+        title: '请填写完整信息',
+        icon: 'none'
+      });
+      return;
+    }
 
     try {
       wx.showLoading({ title: '保存中...' });
-      
-      const data = {
-        startSiteId: this.data.form.startSiteId,
-        endSiteId: this.data.form.endSiteId,
-        price: Number(this.data.form.price),
-        capacity: Number(this.data.form.capacity)
-      };
-      
-      await createRoute(data);
+      if (this.data.id) {
+        await updateLinePrice(this.data.id, form);
+      } else {
+        const submitData = {
+          startSiteId,
+          endSiteId,
+          price: Number(form.price),
+          capacity: Number(form.capacity)
+        };
+        console.log('提交的数据:', submitData);
+        await createRoute(submitData);
+      }
 
       wx.showToast({
         title: '保存成功',
@@ -136,9 +92,8 @@ Page({
       setTimeout(() => {
         wx.navigateBack();
       }, 1500);
-
     } catch (error) {
-      console.error('保存线路失败:', error);
+      console.error('保存失败:', error);
       wx.showToast({
         title: error.message || '保存失败',
         icon: 'none'
@@ -148,36 +103,72 @@ Page({
     }
   },
 
-  async onDeleteRoute() {
+  showStartSitePopup() {
+    this.setData({
+      showStartSitePopup: true
+    });
+  },
+
+  onStartSitePopupClose() {
+    this.setData({
+      showStartSitePopup: false
+    });
+  },
+
+  onStartSiteSelect(e) {
+    const { site } = e.currentTarget.dataset;
+    console.log('选择的起始站点:', site);
+    this.setData({
+      'route.startSite': site,
+      startSiteId: site.id || 'SITE012',
+      showStartSitePopup: false
+    });
+  },
+
+  showEndSitePopup() {
+    this.setData({
+      showEndSitePopup: true
+    });
+  },
+
+  onEndSitePopupClose() {
+    this.setData({
+      showEndSitePopup: false
+    });
+  },
+
+  onEndSiteSelect(e) {
+    const { site } = e.currentTarget.dataset;
+    console.log('选择的到达站点:', site);
+    this.setData({
+      'route.endSite': site,
+      endSiteId: site.id || 'SITE012',
+      showEndSitePopup: false
+    });
+  },
+
+  onPriceChange(e) {
+    this.setData({
+      'form.price': e.detail
+    });
+  },
+
+  onCapacityChange(e) {
+    this.setData({
+      'form.capacity': e.detail
+    });
+  },
+
+  async loadSites() {
     try {
-      const res = await wx.showModal({
-        title: '确认删除',
-        content: '确定要删除该线路吗？',
-        confirmText: '删除',
-        confirmColor: '#ee0a24'
-      });
-
-      if (res.confirm) {
-        wx.showLoading({ title: '删除中...' });
-        await deleteRoute(this.data.id);
-
-        wx.showToast({
-          title: '删除成功',
-          icon: 'success'
-        });
-
-        setTimeout(() => {
-          wx.navigateBack();
-        }, 1500);
-      }
+      const sites = await getSites();
+      this.setData({ sites });
     } catch (error) {
-      console.error('删除线路失败:', error);
+      console.error('加载站点列表失败:', error);
       wx.showToast({
-        title: error.message || '删除失败',
+        title: error.message || '加载站点失败',
         icon: 'none'
       });
-    } finally {
-      wx.hideLoading();
     }
   }
 }); 
