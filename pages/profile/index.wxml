@@ -12,7 +12,7 @@
   </view>
 
   <!-- 功能列表 -->
-  <view class="function-list">
+  <view class="function-list" wx:if="{{isAdmin}}">
     <van-cell-group>
       <van-cell 
         title="站点管理" 

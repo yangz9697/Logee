@@ -35,7 +35,7 @@
         bind:click="showAddressSearch"
       />
       
-      <van-field
+      <!-- <van-field
         label="白班联系人"
         value="{{ site.dayShiftContact }}"
         placeholder="请输入白班联系人"
@@ -65,15 +65,24 @@
         maxlength="11"
         placeholder="请输入晚班联系电话"
         bind:change="onNightShiftPhoneChange"
-      />
+      /> -->
 
       <van-field
         label="自提电话"
         value="{{ site.selfPickupPhone }}"
-        type="number"
-        maxlength="11"
-        placeholder="请输入自提联系电话"
+        placeholder="请输入自提电话"
         bind:change="onSelfPickupPhoneChange"
+      />
+
+      <van-field
+        label="备注"
+        value="{{ site.remark }}"
+        placeholder="请输入备注信息"
+        type="textarea"
+        autosize
+        maxlength="200"
+        show-word-limit
+        bind:change="onRemarkChange"
       />
     </van-cell-group>
 

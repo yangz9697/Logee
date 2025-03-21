@@ -1,26 +1,111 @@
 <!--pages/analysis/index.wxml-->
 <view class="container">
-  <block wx:for="{{lines}}" wx:key="startSite.id">
-    <view class="start-site">{{item.startSite.name}}</view>
-    <view class="line-item" 
-      wx:for="{{item.lines}}" 
-      wx:key="id"
-      wx:for-item="line"
-    >
-      <view class="route-info">
-        <text>{{line.endSite.name}}</text>
+  <block wx:for="{{flows}}" wx:key="flowName">
+    <view class="flow-container">
+      <view class="flow-header">
+        <text class="flow-name">{{item.flowName}}</text>
       </view>
+      
+      <view class="line-list">
+        <block wx:for="{{item.lines}}" wx:for-item="line" wx:key="id">
+          <van-swipe-cell right-width="{{ 65 }}" wx:if="{{!isAdmin}}">
+            <view class="line-item" bindtap="onLineClick" data-line-id="{{line.id}}">
+              <view class="line-header">
+                <view class="route-info">
+                  <text class="route-name">{{line.startSite}} - {{line.endSite}}</text>
+                  <text class="cargo-tag" wx:if="{{line.orders.length > 0}}">库存</text>
+                </view>
+                <view class="line-meta">
+                  <view class="followers" wx:if="{{line.followers.length > 0}}">
+                    <text wx:for="{{line.followers}}" 
+                          wx:for-item="follower" 
+                          wx:key="id"
+                          class="follower-tag"
+                    >{{follower.name}}</text>
+                  </view>
+                  <view class="status-tag {{line.status === 'sufficient' ? 'status-tag-green' : line.status === 'limited' ? 'status-tag-yellow' : 'status-tag-red'}}">
+                    {{line.status === 'sufficient' ? '充足' : line.status === 'limited' ? '少量' : '停收'}}
+                  </view>
+                </view>
+              </view>
+              
+              <!-- 订单列表 -->
+              <view class="order-list" wx:if="{{selectedLineId === line.id && line.orders.length > 0}}">
+                <view class="order-item" wx:for="{{line.orders}}" wx:for-item="order" wx:key="id">
+                  <text class="order-cell">{{order.cargo}}</text>
+                  <text class="order-cell">{{order.startArea}}</text>
+                  <text class="order-cell">{{order.weight}}吨</text>
+                  <text class="order-cell">{{order.driver}}</text>
+                  <text class="order-cell">{{order.arrivalTime}}</text>
+                </view>
+              </view>
+            </view>
 
-      <view class="capacity-info">
-        <view class="capacity-item">
-          <text class="value {{line.usedCapacity > 0 ? 'warning' : ''}}">仓位：{{line.usedCapacity}}/{{line.availableCapacity}}吨</text>
-        </view>
-        <!-- <view class="capacity-item">
-          <text class="value">在仓订单数：{{line.orderCount}}</text>
-        </view> -->
+            <!-- 滑动操作按钮 -->
+            <view slot="right" class="swipe-actions">
+              <view 
+                class="swipe-btn {{line.isFollowed ? 'unfollow' : 'follow'}}"
+                bindtap="{{line.isFollowed ? 'onUnfollowLine' : 'onFollowLine'}}"
+                data-line-id="{{line.id}}"
+              >
+                {{line.isFollowed ? '取消' : '关注'}}
+              </view>
+            </view>
+          </van-swipe-cell>
+
+          <!-- 管理员视图 -->
+          <view class="line-item" bindtap="onLineClick" data-line-id="{{line.id}}" wx:else>
+            <view class="line-header">
+              <view class="route-info">
+                <text class="route-name">{{line.startSite}} - {{line.endSite}}</text>
+                <text class="cargo-tag" wx:if="{{line.orders.length > 0}}">库存</text>
+              </view>
+              <view class="line-meta">
+                <view class="followers" wx:if="{{line.followers.length > 0}}">
+                  <text wx:for="{{line.followers}}" 
+                        wx:for-item="follower" 
+                        wx:key="id"
+                        class="follower-tag"
+                  >{{follower.name}}</text>
+                </view>
+                <view class="status-tags">
+                  <view 
+                    class="status-tag {{line.status === 'large' ? 'status-tag-green active' : ''}}" 
+                    data-status="large" 
+                    data-line-id="{{line.id}}"
+                    catch:tap="onStatusChange"
+                  >充足</view>
+                  <view 
+                    class="status-tag {{line.status === 'medium' ? 'status-tag-yellow active' : ''}}" 
+                    data-status="medium" 
+                    data-line-id="{{line.id}}"
+                    catch:tap="onStatusChange"
+                  >少量</view>
+                  <view 
+                    class="status-tag {{line.status === 'small' ? 'status-tag-red active' : ''}}" 
+                    data-status="small" 
+                    data-line-id="{{line.id}}"
+                    catch:tap="onStatusChange"
+                  >停收</view>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 订单列表 -->
+            <view class="order-list" wx:if="{{selectedLineId === line.id && line.orders.length > 0}}">
+              <view class="order-item" wx:for="{{line.orders}}" wx:for-item="order" wx:key="id">
+                <text class="order-cell">{{order.cargo}}</text>
+                <text class="order-cell">{{order.startArea}}</text>
+                <text class="order-cell">{{order.weight}}吨</text>
+                <text class="order-cell">{{order.driver}}</text>
+                <text class="order-cell">{{order.arrivalTime}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
       </view>
     </view>
   </block>
 
-  <van-empty wx:if="{{lines.length === 0}}" description="暂无数据" />
+  <van-empty wx:if="{{flows.length === 0}}" description="暂无数据" />
 </view>

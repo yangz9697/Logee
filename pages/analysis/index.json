@@ -1,3 +1,7 @@
 {
-    "usingComponents": {}
+    "usingComponents": {
+        "van-empty": "@vant/weapp/empty/index"
+    },
+    "enablePullDownRefresh": true,
+    "backgroundColor": "#f7f8fa"
 }

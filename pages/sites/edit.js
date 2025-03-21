@@ -8,13 +8,14 @@ Page({
       name: '',
       city: '',
       location: '',
-      latitude: '',
-      longitude: '',
+      lat: '',
+      lng: '',
       dayShiftContact: '',
       dayShiftPhone: '',
       nightShiftContact: '',
       nightShiftPhone: '',
-      selfPickupPhone: ''
+      selfPickupPhone: '',
+      remark: ''
     },
     loading: false,
     showAddressPopup: false,
@@ -38,7 +39,24 @@ Page({
     try {
       this.setData({ loading: true });
       const site = await getSite(this.data.id);
-      this.setData({ site });
+      
+      // 处理后端返回的数据，映射到前端数据结构
+      const formattedSite = {
+        name: site.name,
+        city: site.city,
+        location: site.location,
+        lat: site.lat,
+        lng: site.lng,
+        remark: site.remark || '', // 添加备注字段映射
+        // 处理联系人信息
+        dayShiftContact: site.dayReceiver ? site.dayReceiver.split('/')[0] : '',
+        dayShiftPhone: site.dayReceiver ? site.dayReceiver.split('/')[1] : '',
+        nightShiftContact: site.nightReceiver ? site.nightReceiver.split('/')[0] : '',
+        nightShiftPhone: site.nightReceiver ? site.nightReceiver.split('/')[1] : '',
+        selfPickupPhone: site.selfPickup ? site.selfPickup.split('/')[1] : ''
+      };
+
+      this.setData({ site: formattedSite });
     } catch (error) {
       console.error('加载站点信息失败:', error);
       wx.showToast({
@@ -98,6 +116,12 @@ Page({
     });
   },
 
+  onRemarkChange(e) {
+    this.setData({
+      'site.remark': e.detail
+    });
+  },
+
   showAddressSearch() {
     this.setData({ showAddressPopup: true });
   },
@@ -134,9 +158,9 @@ Page({
   onSelectAddress(e) {
     const { item } = e.currentTarget.dataset;
     this.setData({
-      'site.location': item.district || item.name,
-      'site.latitude': item.location.lat,
-      'site.longitude': item.location.lng,
+      'site.location': item.name,
+      'site.lat': item.location.lat,
+      'site.lng': item.location.lng,
       showAddressPopup: false,
       searchValue: '',
       searchResults: []
@@ -148,7 +172,7 @@ Page({
     console.log(site, id);
     
     // 只验证必要字段
-    if (!site.name || !site.city || !site.location || !site.latitude || !site.longitude) {
+    if (!site.name || !site.city || !site.location || !site.lat || !site.lng) {
       wx.showToast({
         title: '请填写必要信息',
         icon: 'none'
@@ -164,15 +188,16 @@ Page({
         name: site.name,
         city: site.city,
         location: site.location,
-        lng: Number(site.longitude),  // 转换为数字
-        lat: Number(site.latitude),   // 转换为数字
+        lng: Number(site.lng),  // 转换为数字
+        lat: Number(site.lat),   // 转换为数字
         // 组合联系人和电话
         dayReceiver: site.dayShiftContact && site.dayShiftPhone ? 
           `${site.dayShiftContact}/${site.dayShiftPhone}` : '',
         nightReceiver: site.nightShiftContact && site.nightShiftPhone ? 
           `${site.nightShiftContact}/${site.nightShiftPhone}` : '',
         selfPickup: site.selfPickupPhone ? 
-          `自提/${site.selfPickupPhone}` : ''
+          `自提/${site.selfPickupPhone}` : '',
+        remark: site.remark || ''
       };
 
       if (id) {

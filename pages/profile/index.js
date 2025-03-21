@@ -8,6 +8,7 @@ Page({
      */
     data: {
         userInfo: null,
+        isAdmin: false,
         hasUserInfo: false,
         canIUseGetUserProfile: false,
     },
@@ -18,7 +19,11 @@ Page({
     onLoad(options) {
         // 从本地存储获取用户信息
         const userInfo = wx.getStorageSync('userInfo');
-        this.setData({ userInfo });
+        const isAdmin = userInfo?.roleName === '管理员';
+        this.setData({ 
+            userInfo,
+            isAdmin
+        });
     },
 
     /**
@@ -34,7 +39,11 @@ Page({
     onShow() {
         // 每次显示页面时刷新用户信息
         const userInfo = wx.getStorageSync('userInfo');
-        this.setData({ userInfo });
+        const isAdmin = userInfo?.roleName === '管理员';
+        this.setData({ 
+            userInfo,
+            isAdmin
+        });
     },
 
     /**

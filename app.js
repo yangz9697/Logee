@@ -10,7 +10,7 @@ App({
     onLaunch(options) {
         // 初始化云开发环境
         wx.cloud.init({
-            env: 'logi-server-6gt3vb7g395c088a',  // 替换为你的云开发环境ID
+            env: 'cloudbase-9gq01ndv8ef33601',  // 替换为你的云开发环境ID
             traceUser: true
         });
         

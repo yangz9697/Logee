@@ -68,6 +68,16 @@ Page({
 
     },
 
+    // 添加仓位映射函数
+    getCapacityText(capacity) {
+        const capacityMap = {
+            'small': '停收',
+            'medium': '少量',
+            'large': '充足'
+        };
+        return capacityMap[capacity] || '未知';
+    },
+
     async loadRoutes() {
         try {
             this.setData({ loading: true });
@@ -77,6 +87,7 @@ Page({
                     ...route,
                     endSites: route.endSites.map(site => ({
                         ...site,
+                        capacityText: this.getCapacityText(site.capacity), // 添加文字描述
                         disabled: !site.enabled
                     }))
                 }))
@@ -98,10 +109,13 @@ Page({
         });
     },
 
-    onEditRoute(e) {
-        const { id } = e.currentTarget.dataset;
+    onEditLine(e) {
+        const { routeIndex, lineIndex } = e.currentTarget.dataset;
+        const route = this.data.routes[routeIndex];
+        const line = route.endSites[lineIndex];
+        
         wx.navigateTo({
-            url: `/pages/routes/edit?id=${id}`
+            url: `/pages/routes/edit?id=${line.id}&startSiteName=${route.startSite.name}&endSiteName=${line.site.name}&price=${line.price}&direction=${line.direction || ''}`
         });
     },
 
@@ -194,14 +208,7 @@ Page({
     },
 
     async onCapacityChange(e) {
-        const value = Number(e.detail.value);
-        if (isNaN(value) || value <= 0) {
-            wx.showToast({
-                title: '请输入有效的仓位',
-                icon: 'none'
-            });
-            return;
-        }
+        const value = e.detail;
         
         const { selectedStartSite, selectedEndSite } = this.data;
         try {
@@ -215,6 +222,7 @@ Page({
                 site => site.site.id === selectedEndSite.site.id
             );
             endSite.capacity = value;
+            endSite.capacityText = this.getCapacityText(value);
             
             this.setData({
                 selectedEndSite: endSite,
@@ -238,11 +246,9 @@ Page({
         const { routeIndex, lineIndex } = e.currentTarget.dataset;
         const line = this.data.routes[routeIndex].endSites[lineIndex];
         const enabled = e.detail;
-        console.log(line, enabled);
         try {
             await updateLineStatus(line.id, { enabled });
             
-            // 更新本地数据
             this.setData({
                 [`routes[${routeIndex}].endSites[${lineIndex}].disabled`]: !enabled
             });
@@ -262,11 +268,12 @@ Page({
 
     onDeleteLine(e) {
         const { routeIndex, lineIndex } = e.currentTarget.dataset;
-        const line = this.data.routes[routeIndex].endSites[lineIndex];
+        const route = this.data.routes[routeIndex];
+        const line = route.endSites[lineIndex];
         
         Dialog.confirm({
             title: '确认删除',
-            message: `确定要删除 ${this.data.routes[routeIndex].startSite.name} → ${line.site.name} 线路吗？`,
+            message: `确定要删除 ${route.startSite.name} → ${line.site.name} 线路吗？`,
         }).then(async () => {
             try {
                 await deleteRoute(line.id);
@@ -274,6 +281,10 @@ Page({
                 // 更新本地数据
                 const routes = [...this.data.routes];
                 routes[routeIndex].endSites.splice(lineIndex, 1);
+                // 如果该起始站点没有终点站了，删除整个起始站点
+                if (routes[routeIndex].endSites.length === 0) {
+                    routes.splice(routeIndex, 1);
+                }
                 this.setData({ routes });
 
                 wx.showToast({
@@ -290,21 +301,11 @@ Page({
         });
     },
 
-    onEditLine(e) {
-        const { routeIndex, lineIndex } = e.currentTarget.dataset;
-        const route = this.data.routes[routeIndex];
-        const line = route.endSites[lineIndex];
-        
-        wx.navigateTo({
-            url: `/pages/routes/edit?id=${line.id}&startSiteId=${route.startSite.id}&endSiteId=${line.site.id}`
-        });
-    },
-
-    // 阻止switch点击事件冒泡
-    onSwitchTap(e) {
+    // 阻止事件冒泡
+    onActionTap(e) {
         if (e && e.stopPropagation) {
             e.stopPropagation();
         }
-        return false;  // 返回 false 也可以阻止冒泡
+        return false;
     }
 })

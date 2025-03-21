@@ -1,5 +1,5 @@
 // pages/analysis/index.js
-import { getLinesCapacity } from '../../services/routes';
+import { getFlows, followLine, unfollowLine, updateLineStatus } from '../../services/routes';
 
 Page({
 
@@ -7,15 +7,24 @@ Page({
      * 页面的初始数据
      */
     data: {
+        isAdmin: false,
         loading: false,
-        lines: []
+        flows: [],
+        selectedLineId: null,
+        currentUser: {}
     },
 
     /**
      * 生命周期函数--监听页面加载
      */
     onLoad(options) {
-        this.loadCapacityData();
+        const currentUser = wx.getStorageSync('userInfo') || {};
+        const isAdmin = currentUser.roleName === '管理员';
+        this.setData({ 
+            currentUser,
+            isAdmin
+        });
+        this.loadFlows();
     },
 
     /**
@@ -50,7 +59,9 @@ Page({
      * 页面相关事件处理函数--监听用户下拉动作
      */
     onPullDownRefresh() {
-        this.loadCapacityData();
+        this.loadFlows().then(() => {
+            wx.stopPullDownRefresh();
+        });
     },
 
     /**
@@ -67,21 +78,87 @@ Page({
 
     },
 
-    async loadCapacityData() {
+    async loadFlows() {
         try {
             this.setData({ loading: true });
-            const data = await getLinesCapacity();
-            const lines = data || [];
-            this.setData({ lines });
+            const res = await getFlows();
+            this.setData({ flows: res.flows });
         } catch (error) {
-            console.error('加载仓位数据失败:', error);
+            console.error('加载流向列表失败:', error);
             wx.showToast({
                 title: error.message || '加载失败',
                 icon: 'none'
             });
         } finally {
             this.setData({ loading: false });
-            wx.stopPullDownRefresh();
         }
+    },
+
+    // 关注线路
+    async onFollowLine(e) {
+        const { lineId } = e.currentTarget.dataset;
+        try {
+            await followLine(lineId);
+            await this.loadFlows(); // 重新加载数据以更新关注状态
+            
+            wx.showToast({
+                title: '关注成功',
+                icon: 'success'
+            });
+        } catch (error) {
+            console.error('关注失败:', error);
+            wx.showToast({
+                title: error.message || '关注失败',
+                icon: 'none'
+            });
+        }
+    },
+
+    // 取消关注
+    async onUnfollowLine(e) {
+        const { lineId } = e.currentTarget.dataset;
+        try {
+            await unfollowLine(lineId);
+            await this.loadFlows(); // 重新加载数据以更新关注状态
+            
+            wx.showToast({
+                title: '已取消关注',
+                icon: 'success'
+            });
+        } catch (error) {
+            console.error('取消关注失败:', error);
+            wx.showToast({
+                title: error.message || '操作失败',
+                icon: 'none'
+            });
+        }
+    },
+
+    // 管理员修改状态
+    async onStatusChange(event) {
+        const { lineId, status } = event.currentTarget.dataset;
+        
+        try {
+            await updateLineStatus(lineId, { status });
+            await this.loadFlows(); // 重新加载数据以更新状态
+            
+            wx.showToast({
+                title: '状态更新成功',
+                icon: 'success'
+            });
+        } catch (error) {
+            console.error('更新状态失败:', error);
+            wx.showToast({
+                title: error.message || '更新失败',
+                icon: 'none'
+            });
+        }
+    },
+
+    onLineClick(event) {
+        const { lineId } = event.currentTarget.dataset;
+        this.setData({
+            selectedLineId: this.data.selectedLineId === lineId ? null : lineId
+        });
     }
 })

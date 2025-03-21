@@ -54,7 +54,7 @@
 .line-actions {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 24rpx;
 }
 
 .footer-action {
@@ -206,16 +206,7 @@
 }
 
 .delete-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  height: 72rpx;
-  color: #ee0a24;
-  font-size: 28rpx;
-  background: #fff;
-  border-radius: 8rpx;
+  padding: 8rpx;
 }
 
 .add-btn {
@@ -227,4 +218,31 @@
   color: #ffffff;
   background: #007AFF;
   border-radius: 8rpx;
+}
+
+.capacity-tag {
+  font-size: 24rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.capacity-small {
+  color: #ee0a24;
+  background: #fde8e8;
+}
+
+.capacity-medium {
+  color: #ff976a;
+  background: #fef3eb;
+}
+
+.capacity-large {
+  color: #07c160;
+  background: #e8f8eb;
+}
+
+.direction {
+  margin-left: 12rpx;
+  font-size: 24rpx;
+  color: #666;
 }

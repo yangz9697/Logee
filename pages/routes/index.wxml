@@ -23,16 +23,18 @@
             <text>{{line.site.name}}</text>
             <text class="separator">|</text>
             <text>{{line.price}}元/吨</text>
+            <text class="separator">|</text>
+            <text class="capacity-tag capacity-{{line.capacity}}">{{line.capacityText}}</text>
+            <text wx:if="{{line.direction}}" class="direction">{{line.direction}}</text>
           </view>
         </view>
-        <view class="line-actions">
+        <view class="line-actions" catchtap="onActionTap">
           <van-switch
             checked="{{!line.disabled}}"
             size="20px"
             bind:change="onToggleLine"
             data-route-index="{{index}}"
             data-line-index="{{lineIndex}}"
-            catchtap
           />
         </view>
       </view>

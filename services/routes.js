@@ -59,11 +59,35 @@ export const getLinesCapacity = () => {
   });
 };
 
-// 更新线路状态（启用/禁用）
-export const updateLineStatus = (lineId, data) => {
+// 获取流向列表
+export const getFlows = () => {
   return request({
-    url: `/lines/${lineId}/status`,
-    method: 'PATCH',
+    url: '/flows',
+    method: 'GET'
+  });
+};
+
+// 关注线路
+export const followLine = (id) => {
+  return request({
+    url: `/routes/${id}/follow`,
+    method: 'POST'
+  });
+};
+
+// 取消关注
+export const unfollowLine = (id) => {
+  return request({
+    url: `/routes/${id}/follow`,
+    method: 'DELETE'
+  });
+};
+
+// 更新线路状态（启用/禁用）
+export const updateLineStatus = (id, data) => {
+  return request({
+    url: `/routes/${id}/status`,
+    method: 'PUT',
     data
   });
 }; 
